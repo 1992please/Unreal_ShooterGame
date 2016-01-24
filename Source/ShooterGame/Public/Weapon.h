@@ -62,5 +62,17 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void Fire();
+	virtual void Fire();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	virtual void Reload();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	bool HaveAmmoInMag();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	bool IsMagFull();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	bool HaveAmmoInBackpack();
 };

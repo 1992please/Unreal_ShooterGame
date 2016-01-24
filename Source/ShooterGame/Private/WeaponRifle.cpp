@@ -13,4 +13,15 @@ AWeaponRifle::AWeaponRifle()
 		WeaponMesh->SetSkeletalMesh(WeaponObject.Object);
 }
 
+void AWeaponRifle::Fire()
+{
+	Super::Fire();
 
+
+}
+
+void AWeaponRifle::Reload()
+{
+	Super::Reload();
+
+}

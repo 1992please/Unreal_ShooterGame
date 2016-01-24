@@ -101,31 +101,31 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 					WeaponSlot1 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot1)
 					{
-						WeaponSlot1->IndexInBackpack = index;
+						//WeaponSlot1->IndexInBackpack = index;
 						UGameplayStatics::FinishSpawningActor(WeaponSlot1, GetTransform());
-						WeaponSlot1->AttachRootComponentTo(FPPMesh, WeaponSlot1->AttachSocketNameFPP, EAttachLocation::SnapToTarget);
+						WeaponSlot1->AttachRootComponentTo(FPPMesh, WeaponSlot1->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
 					}
 					break;
 				}
 				case 2:
 				{
 					WeaponSlot2 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					if (WeaponSlot1)
+					if (WeaponSlot2)
 					{
-						WeaponSlot2->IndexInBackpack = index;
+						//WeaponSlot2->IndexInBackpack = index;
 						UGameplayStatics::FinishSpawningActor(WeaponSlot2, GetTransform());
-						WeaponSlot2->AttachRootComponentTo(FPPMesh, WeaponSlot2->AttachSocketNameFPP, EAttachLocation::SnapToTarget);
+						WeaponSlot2->AttachRootComponentTo(FPPMesh, WeaponSlot2->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
 					}
 					break;
 				}
 				case 3:
 				{
 					WeaponSlot3 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					if (WeaponSlot1)
+					if (WeaponSlot3)
 					{
-						WeaponSlot3->IndexInBackpack = index;
+						//WeaponSlot3->IndexInBackpack = index;
 						UGameplayStatics::FinishSpawningActor(WeaponSlot3, GetTransform());
-						WeaponSlot3->AttachRootComponentTo(FPPMesh, WeaponSlot3->AttachSocketNameFPP, EAttachLocation::SnapToTarget);
+						WeaponSlot3->AttachRootComponentTo(FPPMesh, WeaponSlot3->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
 					}
 					break;
 				}

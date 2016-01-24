@@ -30,7 +30,9 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	// Start with Full Ammo
+	CurrentAmmoInMag = MaxAmmoInMag;
+	CurrentAmmoInBackpack = MaxAmmoInBackpack;
 }
 
 // Called every frame
@@ -42,5 +44,37 @@ void AWeapon::Tick( float DeltaTime )
 
 void AWeapon::Fire()
 {
+	CurrentAmmoInMag--;
+}
 
+void AWeapon::Reload()
+{
+	int32 NeededAmmo = MaxAmmoInMag - CurrentAmmoInMag;
+	// Check to see the CurrentAmmoInBackpack is enough for a full reload
+	if (CurrentAmmoInBackpack > NeededAmmo)
+	{
+		// full reload
+		CurrentAmmoInBackpack -= NeededAmmo;
+		CurrentAmmoInMag = MaxAmmoInMag;
+	}
+	else
+	{
+		CurrentAmmoInMag += CurrentAmmoInBackpack;
+		CurrentAmmoInBackpack = 0;
+	}
+}
+
+bool AWeapon::HaveAmmoInMag()
+{
+	return CurrentAmmoInMag > 0;
+}
+
+bool AWeapon::IsMagFull()
+{
+	return CurrentAmmoInMag == 0;
+}
+
+bool AWeapon::HaveAmmoInBackpack()
+{
+	return CurrentAmmoInBackpack > 0;
 }
