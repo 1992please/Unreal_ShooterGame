@@ -79,6 +79,19 @@ void AGamePlayCharacter::Tick(float DeltaTime)
 void AGamePlayCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
+
+	InputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this, &AGamePlayCharacter::OnStartFire);
+	InputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &AGamePlayCharacter::OnStopFire);
+}
+
+void AGamePlayCharacter::OnStartFire()
+{
+	CurrentWeapon->StartFire();
+}
+
+void AGamePlayCharacter::OnStopFire()
+{
+	CurrentWeapon->StopFire();
 }
 
 UShooterGameInstance* AGamePlayCharacter::GetShooterGameInstance()
@@ -102,6 +115,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 					if (WeaponSlot1)
 					{
 						//WeaponSlot1->IndexInBackpack = index;
+						WeaponSlot1->SetOwningPawn(this);
 						UGameplayStatics::FinishSpawningActor(WeaponSlot1, GetTransform());
 						WeaponSlot1->AttachRootComponentTo(FPPMesh, WeaponSlot1->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
 					}
@@ -112,6 +126,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 					WeaponSlot2 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot2)
 					{
+						WeaponSlot2->SetOwningPawn(this);
 						//WeaponSlot2->IndexInBackpack = index;
 						UGameplayStatics::FinishSpawningActor(WeaponSlot2, GetTransform());
 						WeaponSlot2->AttachRootComponentTo(FPPMesh, WeaponSlot2->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
@@ -123,6 +138,8 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 					WeaponSlot3 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot3)
 					{
+						WeaponSlot3->SetOwningPawn(this);
+
 						//WeaponSlot3->IndexInBackpack = index;
 						UGameplayStatics::FinishSpawningActor(WeaponSlot3, GetTransform());
 						WeaponSlot3->AttachRootComponentTo(FPPMesh, WeaponSlot3->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
@@ -136,7 +153,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 	ShowWeapon(WeaponSlot1);
 	CurrentWeapon = WeaponSlot1;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "SpawnWeaponsAndAssignToSlots");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "SpawnWeaponsAndAssignToSlots");
 }
 
 void AGamePlayCharacter::ShowWeapon(AWeapon* WeaponToShow)
@@ -144,7 +161,7 @@ void AGamePlayCharacter::ShowWeapon(AWeapon* WeaponToShow)
 	WeaponSlot1->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot1));
 	WeaponSlot2->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot2));
 	WeaponSlot3->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot3));
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Show Weapon");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Show Weapon");
 }
 
 void AGamePlayCharacter::EquipWeapon(AWeapon* WhichWeapon)
@@ -155,7 +172,7 @@ void AGamePlayCharacter::EquipWeapon(AWeapon* WhichWeapon)
 	bisChangingWeapon = true;
 
 	BindingToBeEquiped = WhichWeapon;
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Equipe Weapon");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Equipe Weapon");
 	Timeline.PlayFromStart();
 }
 
@@ -172,4 +189,29 @@ void AGamePlayCharacter::TimeLineWeaponDown()
 
 	// Set current weapon after equipping
 	CurrentWeapon = BindingToBeEquiped;
+}
+
+float AGamePlayCharacter::PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName)
+{
+	if (FPPMesh && AnimMontage && FPPMesh->AnimScriptInstance)
+	{
+		return FPPMesh->AnimScriptInstance->Montage_Play(AnimMontage, InPlayRate);
+	}
+	return 0.0f;
+}
+
+void AGamePlayCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
+{
+	if (FPPMesh && AnimMontage && FPPMesh->AnimScriptInstance && FPPMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
+	{
+		FPPMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOutTime);
+	}
+}
+
+void AGamePlayCharacter::StopAllAnimMontages()
+{
+	if (FPPMesh && FPPMesh->AnimScriptInstance)
+	{
+		FPPMesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
 }

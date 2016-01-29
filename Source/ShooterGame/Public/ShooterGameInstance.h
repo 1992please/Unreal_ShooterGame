@@ -17,7 +17,7 @@ class SHOOTERGAME_API UShooterGameInstance : public UGameInstance
 	UShooterGameInstance();
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<struct FWeaponBackpackItem> Backpack_Weapons;
 	
 	/**

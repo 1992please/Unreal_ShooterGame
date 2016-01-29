@@ -13,15 +13,15 @@ AWeaponRifle::AWeaponRifle()
 		WeaponMesh->SetSkeletalMesh(WeaponObject.Object);
 }
 
-void AWeaponRifle::Fire()
+void AWeaponRifle::StartFire()
 {
-	Super::Fire();
+	Super::StartFire();
 
 
 }
 
-void AWeaponRifle::Reload()
+void AWeaponRifle::StartReload()
 {
-	Super::Reload();
+	Super::StartReload();
 
 }

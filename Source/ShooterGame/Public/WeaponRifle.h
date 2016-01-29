@@ -16,6 +16,6 @@ class SHOOTERGAME_API AWeaponRifle : public AWeapon
 public:
 	AWeaponRifle();
 	
-	void Fire() override;
-	void Reload() override;
+	void StartFire() override;
+	void StartReload() override;
 };

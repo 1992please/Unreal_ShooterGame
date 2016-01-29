@@ -20,8 +20,29 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
+
+	//////////////////////////////////////////////////////////////////
+	// Input handlers
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+	void OnStartFire();
+
+	void OnStopFire();
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// Animations
+
+	/** play anim montage */
+	virtual float PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
+
+	/** stop playing montage */
+	virtual void StopAnimMontage(class UAnimMontage* AnimMontage) override;
+
+	/** stop playing all montages */
+	void StopAllAnimMontages();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -61,6 +82,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SpawnWeaponsAndAssignToSlots();
+
+
+
 protected:
 
 	UFUNCTION(BlueprintPure, Category = Utility)
