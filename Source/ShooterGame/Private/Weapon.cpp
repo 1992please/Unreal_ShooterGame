@@ -106,12 +106,13 @@ void AWeapon::DetermineWeaponState()
 
 void AWeapon::SetWeaponState(EWeaponState::Type NewState)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, NewState ==  EWeaponState::Idle ?"Set State Idle": "Set State fire");
 	if (NewState == EWeaponState::Firing && CurrentState != EWeaponState::Firing)
 	{
 		OnBurstStarted();
 	}
 
-	if (NewState != EWeaponState::Firing && CurrentState != EWeaponState::Firing)
+	if (NewState != EWeaponState::Firing && CurrentState == EWeaponState::Firing)
 	{
 		OnBurstFinished();
 	}
@@ -123,7 +124,7 @@ void AWeapon::OnBurstStarted()
 	const float GameTime = GetWorld()->GetTimeSeconds();
 	if (LastFireTime > 0 && WeaponConfig.TimeBetweenShots > 0.0f && LastFireTime + WeaponConfig.TimeBetweenShots > GameTime)
 	{
-		GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, LastFireTime + WeaponConfig.TimeBetweenShots, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, LastFireTime + WeaponConfig.TimeBetweenShots - GameTime, false);
 	}
 	else
 	{
@@ -134,6 +135,7 @@ void AWeapon::OnBurstStarted()
 
 void AWeapon::OnBurstFinished()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
 	if (MuzzlePSC != NULL)
 	{
 		MuzzlePSC->DeactivateSystem();
@@ -157,6 +159,7 @@ void AWeapon::OnBurstFinished()
 
 void AWeapon::HandleFiring()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Fire");
 	if (CurrentAmmoInClip > 0 || WeaponConfig.bInfiniteClip || WeaponConfig.bInfiniteAmmo && CanFire())
 	{
 		SimulateWeaponFire();
@@ -180,6 +183,7 @@ void AWeapon::HandleFiring()
 
 void AWeapon::SimulateWeaponFire()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "simulate Fire");
 	// Particle Effects
 	if (MuzzleFX)
 	{
@@ -197,6 +201,7 @@ void AWeapon::SimulateWeaponFire()
 	if (bLoopedFireSound && FireAC == NULL && FireLoopSound)
 	{
 		FireAC = UGameplayStatics::SpawnSoundAttached(FireLoopSound, MyPawn->GetRootComponent());
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Sound");
 	}
 }
 

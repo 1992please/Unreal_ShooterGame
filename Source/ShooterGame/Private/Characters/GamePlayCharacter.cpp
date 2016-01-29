@@ -205,7 +205,9 @@ void AGamePlayCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
 	if (FPPMesh && AnimMontage && FPPMesh->AnimScriptInstance && FPPMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
 	{
 		FPPMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOutTime);
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
 }
 
 void AGamePlayCharacter::StopAllAnimMontages()
