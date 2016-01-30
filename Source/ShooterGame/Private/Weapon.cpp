@@ -20,6 +20,7 @@ AWeapon::AWeapon()
 	AttachSocketNameTPP = "WeaponPoint";
 	WeaponType = EWeaponType::Rifle;
 	bWantsToFire = false;
+	bPendingReload = false;
 	CurrentState = EWeaponState::Idle;
 	LastFireTime = 0;
 	bPlayingFireAnim = false;
@@ -68,19 +69,65 @@ void AWeapon::StopFire()
 }
 void AWeapon::StartReload()
 {
-	//int32 NeededAmmo = MaxAmmoInMag - CurrentAmmoInMag;
-	//// Check to see the CurrentAmmoInBackpack is enough for a full reload
-	//if (CurrentAmmoInBackpack > NeededAmmo)
-	//{
-	//	// full reload
-	//	CurrentAmmoInBackpack -= NeededAmmo;
-	//	CurrentAmmoInMag = MaxAmmoInMag;
-	//}
-	//else
-	//{
-	//	CurrentAmmoInMag += CurrentAmmoInBackpack;
-	//	CurrentAmmoInBackpack = 0;
-	//}
+	if (CanReload())
+	{
+		bPendingReload = true;
+		DetermineWeaponState();
+	}
+
+	float AnimDuration = 0;
+	if (ReloadAnim)
+	{
+		AnimDuration = MyPawn->PlayAnimMontage(ReloadAnim);
+	}
+
+	if (AnimDuration <= 0.0f)
+	{
+		AnimDuration = WeaponConfig.NoAnimReloadDuration;
+	}
+
+	GetWorldTimerManager().SetTimer(TimerHandle_StopReload, this, &AWeapon::StopReload, AnimDuration, false);
+	if (Role == ROLE_Authority)
+	{
+		ReloadWeapon();
+	}
+
+	if (ReloadSound)
+	{
+		UGameplayStatics::SpawnSoundAttached(ReloadSound, MyPawn->GetRootComponent());
+	}
+}
+
+void AWeapon::ReloadWeapon()
+{
+	int32 ClipDelta = FMath::Min(WeaponConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
+	if (WeaponConfig.bInfiniteClip)
+	{
+		ClipDelta = WeaponConfig.AmmoPerClip - CurrentAmmoInClip;
+	}
+
+	if (ClipDelta > 0)
+	{
+		CurrentAmmoInClip += ClipDelta ;
+	}
+
+	if (WeaponConfig.bInfiniteClip)
+	{
+		CurrentAmmo = FMath::Max(CurrentAmmoInClip, CurrentAmmo);
+	}
+}
+
+void AWeapon::StopReload()
+{
+	if (CurrentState == EWeaponState::Reloading)
+	{
+		bPendingReload = false;
+		DetermineWeaponState();
+		if (ReloadAnim)
+		{
+			MyPawn->StopAnimMontage(ReloadAnim);
+		}
+	}
 }
 
 void AWeapon::SetOwningPawn(AGamePlayCharacter* NewOwner)
@@ -97,7 +144,18 @@ void AWeapon::SetOwningPawn(AGamePlayCharacter* NewOwner)
 void AWeapon::DetermineWeaponState()
 {
 	EWeaponState::Type NewState = EWeaponState::Idle;
-	if (bWantsToFire && CanFire())
+	if (bPendingReload)
+	{
+		if (!CanReload())
+		{
+			NewState = CurrentState;
+		}
+		else
+		{
+			NewState = EWeaponState::Reloading;
+		}
+	}
+	else if (bWantsToFire && CanFire())
 	{
 		NewState = EWeaponState::Firing;
 	}
@@ -106,17 +164,20 @@ void AWeapon::DetermineWeaponState()
 
 void AWeapon::SetWeaponState(EWeaponState::Type NewState)
 {
+	const EWeaponState::Type PrevState = CurrentState;
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, NewState ==  EWeaponState::Idle ?"Set State Idle": "Set State fire");
-	if (NewState == EWeaponState::Firing && CurrentState != EWeaponState::Firing)
+	if (NewState == EWeaponState::Firing && PrevState != EWeaponState::Firing)
 	{
 		OnBurstStarted();
 	}
 
-	if (NewState != EWeaponState::Firing && CurrentState == EWeaponState::Firing)
+	CurrentState = NewState;
+
+	if (NewState != EWeaponState::Firing && PrevState == EWeaponState::Firing)
 	{
 		OnBurstFinished();
 	}
-	CurrentState = NewState;
+
 }
 
 void AWeapon::OnBurstStarted()
@@ -219,7 +280,8 @@ void AWeapon::UseAmmo()
 
 bool AWeapon::CanReload() const
 {
-	return 0;
+	bool bGotAmmo = CurrentAmmoInClip < WeaponConfig.AmmoPerClip && (CurrentAmmo - CurrentAmmoInClip > 0 || WeaponConfig.bInfiniteAmmo);
+	return (CurrentState == EWeaponState::Idle || CurrentState == EWeaponState::Firing) && bGotAmmo;
 }
 
 bool AWeapon::CanFire() const

@@ -109,14 +109,15 @@ public:
 	int32 CurrentAmmo;
 
 public:
-	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual void StartFire();
 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual void StopFire();
 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual void StartReload();
+
+	virtual void StopReload();
+
+	virtual void ReloadWeapon();
 
 	void SetOwningPawn(class AGamePlayCharacter* NewOwner);
 protected:
@@ -126,11 +127,19 @@ protected:
 	
 	bool bWantsToFire;
 
+	bool bPendingReload;
+
 	EWeaponState::Type CurrentState;
 
 	float LastFireTime;
 	/** Handle for efficient management of HandleFiring timer */
 	FTimerHandle TimerHandle_HandleFiring;
+
+	/** Handle the Stoping the reload */
+	FTimerHandle TimerHandle_StopReload;
+
+	/** Handle The Change in the Clip Ammo while reloading */
+	FTimerHandle TimerHandle_ReloadWeapon;
 
 	AGamePlayCharacter* MyPawn;
 
@@ -180,6 +189,14 @@ protected:
 	/** finished burst sound (bLoopedFireSound set) */
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	USoundCue* FireFinishSound;
+
+	/** reload sound */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* ReloadSound;
+
+	/** reload animations */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ReloadAnim;
 
 	void DetermineWeaponState();
 
