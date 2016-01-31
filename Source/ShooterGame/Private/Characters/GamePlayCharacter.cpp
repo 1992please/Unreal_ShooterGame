@@ -82,16 +82,26 @@ void AGamePlayCharacter::SetupPlayerInputComponent(class UInputComponent* InputC
 
 	InputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this, &AGamePlayCharacter::OnStartFire);
 	InputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &AGamePlayCharacter::OnStopFire);
+
+	InputComponent->BindAction("Reload", EInputEvent::IE_Pressed, this, &AGamePlayCharacter::OnReload);
 }
 
 void AGamePlayCharacter::OnStartFire()
 {
-	CurrentWeapon->StartFire();
+	if (CurrentWeapon)
+		CurrentWeapon->StartFire();
 }
 
 void AGamePlayCharacter::OnStopFire()
 {
-	CurrentWeapon->StopFire();
+	if (CurrentWeapon)
+		CurrentWeapon->StopFire();
+}
+
+void AGamePlayCharacter::OnReload()
+{
+	if(CurrentWeapon)
+		CurrentWeapon->StartReload();
 }
 
 UShooterGameInstance* AGamePlayCharacter::GetShooterGameInstance()
@@ -205,9 +215,8 @@ void AGamePlayCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
 	if (FPPMesh && AnimMontage && FPPMesh->AnimScriptInstance && FPPMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
 	{
 		FPPMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOutTime);
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
 }
 
 void AGamePlayCharacter::StopAllAnimMontages()

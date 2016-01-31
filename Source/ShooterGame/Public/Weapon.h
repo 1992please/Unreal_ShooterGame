@@ -121,7 +121,7 @@ public:
 
 	void SetOwningPawn(class AGamePlayCharacter* NewOwner);
 protected:
-	/** weapon data */
+/** weapon data */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponData WeaponConfig;
 	
@@ -169,6 +169,9 @@ protected:
 	/** is fire sound looped? */
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	uint32 bLoopedFireSound : 1;
+
+	/** Weapopn is Refiring */
+	uint32 bRefiring;
 
 	/** spawned component for muzzle FX */
 	UPROPERTY(Transient)

@@ -67,8 +67,10 @@ void AWeapon::StopFire()
 		DetermineWeaponState();
 	}
 }
+
 void AWeapon::StartReload()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Start Reload");
 	if (CanReload())
 	{
 		bPendingReload = true;
@@ -108,7 +110,7 @@ void AWeapon::ReloadWeapon()
 
 	if (ClipDelta > 0)
 	{
-		CurrentAmmoInClip += ClipDelta ;
+		CurrentAmmoInClip += ClipDelta;
 	}
 
 	if (WeaponConfig.bInfiniteClip)
@@ -166,17 +168,18 @@ void AWeapon::SetWeaponState(EWeaponState::Type NewState)
 {
 	const EWeaponState::Type PrevState = CurrentState;
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, NewState ==  EWeaponState::Idle ?"Set State Idle": "Set State fire");
+	if (NewState != EWeaponState::Firing && PrevState == EWeaponState::Firing)
+	{
+		OnBurstFinished();
+	}
+
+	CurrentState = NewState;
+
 	if (NewState == EWeaponState::Firing && PrevState != EWeaponState::Firing)
 	{
 		OnBurstStarted();
 	}
 
-	CurrentState = NewState;
-
-	if (NewState != EWeaponState::Firing && PrevState == EWeaponState::Firing)
-	{
-		OnBurstFinished();
-	}
 
 }
 
@@ -196,7 +199,7 @@ void AWeapon::OnBurstStarted()
 
 void AWeapon::OnBurstFinished()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
 	if (MuzzlePSC != NULL)
 	{
 		MuzzlePSC->DeactivateSystem();
@@ -216,11 +219,17 @@ void AWeapon::OnBurstFinished()
 		if (FireFinishSound)
 			UGameplayStatics::SpawnSoundAttached(FireFinishSound, MyPawn->GetRootComponent());
 	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_HandleFiring);
+
+	bRefiring = false;
 }
 
 void AWeapon::HandleFiring()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Fire");
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Fire");
 	if (CurrentAmmoInClip > 0 || WeaponConfig.bInfiniteClip || WeaponConfig.bInfiniteAmmo && CanFire())
 	{
 		SimulateWeaponFire();
@@ -239,14 +248,27 @@ void AWeapon::HandleFiring()
 	{
 		StartReload();
 	}
+
 	LastFireTime = GetWorld()->GetTimeSeconds();
+
+	if (CurrentAmmoInClip <= 0 && CanReload())
+	{
+		StartReload();
+	}
+
+	bRefiring = (CurrentState == EWeaponState::Firing && WeaponConfig.TimeBetweenShots > 0);
+
+	if (bRefiring)
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, WeaponConfig.TimeBetweenShots, false);
+	}
 }
 
 void AWeapon::SimulateWeaponFire()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "simulate Fire");
 	// Particle Effects
-	if (MuzzleFX)
+	if (MuzzleFX && ( !bLoopedMuzzleFX || MuzzlePSC == NULL))
 	{
 		MuzzlePSC = UGameplayStatics::SpawnEmitterAttached(MuzzleFX, WeaponMesh, MuzzleAttachPoint);
 	}
@@ -262,7 +284,7 @@ void AWeapon::SimulateWeaponFire()
 	if (bLoopedFireSound && FireAC == NULL && FireLoopSound)
 	{
 		FireAC = UGameplayStatics::SpawnSoundAttached(FireLoopSound, MyPawn->GetRootComponent());
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Sound");
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Sound");
 	}
 }
 
@@ -275,6 +297,7 @@ void AWeapon::UseAmmo()
 		{
 			CurrentAmmo--;
 		}
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Ammo: %d, AmmoInClip: %d"), CurrentAmmo, CurrentAmmoInClip));
 	}
 }
 
