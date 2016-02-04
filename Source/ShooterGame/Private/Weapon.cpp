@@ -70,33 +70,34 @@ void AWeapon::StopFire()
 
 void AWeapon::StartReload()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Start Reload");
 	if (CanReload())
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Start Reload");
 		bPendingReload = true;
 		DetermineWeaponState();
-	}
 
-	float AnimDuration = 0;
-	if (ReloadAnim)
-	{
-		AnimDuration = MyPawn->PlayAnimMontage(ReloadAnim);
-	}
+		float AnimDuration = 0;
+		if (ReloadAnim)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Play Reload Animation");
+			AnimDuration = MyPawn->PlayAnimMontage(ReloadAnim);
+		}
+		
+		if (AnimDuration <= 0.0f)
+		{
+			AnimDuration = WeaponConfig.NoAnimReloadDuration;
+		}
 
-	if (AnimDuration <= 0.0f)
-	{
-		AnimDuration = WeaponConfig.NoAnimReloadDuration;
-	}
+		GetWorldTimerManager().SetTimer(TimerHandle_StopReload, this, &AWeapon::StopReload, AnimDuration, false);
+		if (Role == ROLE_Authority)
+		{
+			ReloadWeapon();
+		}
 
-	GetWorldTimerManager().SetTimer(TimerHandle_StopReload, this, &AWeapon::StopReload, AnimDuration, false);
-	if (Role == ROLE_Authority)
-	{
-		ReloadWeapon();
-	}
-
-	if (ReloadSound)
-	{
-		UGameplayStatics::SpawnSoundAttached(ReloadSound, MyPawn->GetRootComponent());
+		if (ReloadSound)
+		{
+			UGameplayStatics::SpawnSoundAttached(ReloadSound, MyPawn->GetRootComponent());
+		}
 	}
 }
 
@@ -123,6 +124,7 @@ void AWeapon::StopReload()
 {
 	if (CurrentState == EWeaponState::Reloading)
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "stop Reload Animation");
 		bPendingReload = false;
 		DetermineWeaponState();
 		if (ReloadAnim)
@@ -199,7 +201,7 @@ void AWeapon::OnBurstStarted()
 
 void AWeapon::OnBurstFinished()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
 	if (MuzzlePSC != NULL)
 	{
 		MuzzlePSC->DeactivateSystem();
@@ -247,6 +249,10 @@ void AWeapon::HandleFiring()
 	else if (CanReload())
 	{
 		StartReload();
+	}
+	else if (bRefiring)
+	{
+		OnBurstFinished();
 	}
 
 	LastFireTime = GetWorld()->GetTimeSeconds();
@@ -297,13 +303,14 @@ void AWeapon::UseAmmo()
 		{
 			CurrentAmmo--;
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Ammo: %d, AmmoInClip: %d"), CurrentAmmo, CurrentAmmoInClip));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Ammo: %d, AmmoInClip: %d"), CurrentAmmo, CurrentAmmoInClip));
 	}
 }
 
 bool AWeapon::CanReload() const
 {
 	bool bGotAmmo = CurrentAmmoInClip < WeaponConfig.AmmoPerClip && (CurrentAmmo - CurrentAmmoInClip > 0 || WeaponConfig.bInfiniteAmmo);
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("bGorAmmo: %d"), CurrentAmmo - CurrentAmmoInClip > 0));
 	return (CurrentState == EWeaponState::Idle || CurrentState == EWeaponState::Firing) && bGotAmmo;
 }
 
