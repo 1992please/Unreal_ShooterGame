@@ -82,7 +82,7 @@ void AWeapon::StartReload()
 			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Play Reload Animation");
 			AnimDuration = MyPawn->PlayAnimMontage(ReloadAnim);
 		}
-		
+
 		if (AnimDuration <= 0.0f)
 		{
 			AnimDuration = WeaponConfig.NoAnimReloadDuration;
@@ -274,7 +274,7 @@ void AWeapon::SimulateWeaponFire()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "simulate Fire");
 	// Particle Effects
-	if (MuzzleFX && ( !bLoopedMuzzleFX || MuzzlePSC == NULL))
+	if (MuzzleFX && (!bLoopedMuzzleFX || MuzzlePSC == NULL))
 	{
 		MuzzlePSC = UGameplayStatics::SpawnEmitterAttached(MuzzleFX, WeaponMesh, MuzzleAttachPoint);
 	}
@@ -317,4 +317,27 @@ bool AWeapon::CanReload() const
 bool AWeapon::CanFire() const
 {
 	return (CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing);
+}
+
+void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& Transform, FHitResult& HitResult, FVector& EndLocation)
+{
+	// the End of the line trance by making some calculation of the forward vector of the camera taking into consideration the the current spread
+	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent) * 10000 + Camera->GetComponentLocation();
+	const FVector WeaponFireSocketLocation = WeaponMesh->GetSocketLocation(WeaponFireSocketName);
+	FHitResult Hit;
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		if (World->LineTraceSingleByChannel(Hit, Camera->GetComponentLocation(), LocalEndPoint, ECollisionChannel::ECC_Visibility))
+		{
+			Transform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
+		}
+		else
+		{
+			Transform = FTransform(Camera->GetComponentRotation() , WeaponFireSocketLocation, FVector(1, 1, 1));
+		}
+		HitResult = Hit;
+		EndLocation = Hit.ImpactPoint;
+	}
+
 }

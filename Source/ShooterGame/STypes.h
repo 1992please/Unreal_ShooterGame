@@ -17,6 +17,95 @@ enum class EWeaponType :uint8
 	Launcher
 };
 
+UENUM(BlueprintType)
+enum class EAmmoType :uint8
+{
+	Conventional,
+	Plasma,
+	Laser
+};
+
+USTRUCT()
+struct FWeaponData
+{
+	GENERATED_USTRUCT_BODY()
+
+		/** inifite ammo for reloads */
+		UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		bool bInfiniteAmmo;
+
+	/** infinite ammo in clip, no reload required */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		bool bInfiniteClip;
+
+	/** max ammo */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		int32 MaxAmmo;
+
+	/** clip size */
+	UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		int32 AmmoPerClip;
+
+	/** initial clips */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		int32 InitialClips;
+
+	/** time between two consecutive shots */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		float TimeBetweenShots;
+
+	/** failsafe reload duration if weapon doesn't have any animation for it */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+		float NoAnimReloadDuration;
+	/** defaults */
+	FWeaponData()
+	{
+		bInfiniteAmmo = false;
+		bInfiniteClip = false;
+		MaxAmmo = 100;
+		AmmoPerClip = 20;
+		InitialClips = 4;
+		TimeBetweenShots = 0.2f;
+		NoAnimReloadDuration = 1.0f;
+	}
+};
+
+USTRUCT()
+struct FAmmoData
+{
+	GENERATED_USTRUCT_BODY()
+
+		/** the type of ammo */
+		UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		EAmmoType AmmoType;
+
+	/** The damage done by the ammo */
+	UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		float Damage;
+
+	/** Crit Chance from 0 to 1 */
+	UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		float CritChance;
+
+	/** the damage done over time if there's a damage */
+	UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		float DamageOverTime;
+
+	/** how much time left for damage over time effect */
+	UPROPERTY(EditDefaultsOnly, Category = AmmoState)
+		float DamageOverTime_TimeLeft;
+
+	/** Intialize some variables */
+	FAmmoData()
+	{
+		AmmoType = EAmmoType::Conventional;
+		Damage = 0;
+		CritChance = 0;
+		DamageOverTime = 0;
+		DamageOverTime_TimeLeft = 0;
+	}
+};
+
 USTRUCT(BlueprintType)
 struct FWeaponBackpackItem
 {

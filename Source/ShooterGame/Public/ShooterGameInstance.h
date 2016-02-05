@@ -18,7 +18,7 @@ class SHOOTERGAME_API UShooterGameInstance : public UGameInstance
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<struct FWeaponBackpackItem> Backpack_Weapons;
+	TArray<FWeaponBackpackItem> Backpack_Weapons;
 	
 	/**
 	*	This function will tell us if there is a space in player inventory to select another 
@@ -29,4 +29,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 	void SetBackpackItemSelected(uint8 BackPackItemIndex, bool IsSelected, uint8 WhichSlot);
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	FAmmoData AmmoConventional;
 };
