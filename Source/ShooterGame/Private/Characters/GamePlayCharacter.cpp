@@ -121,7 +121,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 			{
 				case 1:
 				{
-					WeaponSlot1 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					WeaponSlot1 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot1)
 					{
 						//WeaponSlot1->IndexInBackpack = index;
@@ -133,7 +133,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 				}
 				case 2:
 				{
-					WeaponSlot2 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					WeaponSlot2 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot2)
 					{
 						WeaponSlot2->SetOwningPawn(this);
@@ -145,7 +145,7 @@ void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 				}
 				case 3:
 				{
-					WeaponSlot3 = GetWorld()->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					WeaponSlot3 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					if (WeaponSlot3)
 					{
 						WeaponSlot3->SetOwningPawn(this);
@@ -225,4 +225,9 @@ void AGamePlayCharacter::StopAllAnimMontages()
 	{
 		FPPMesh->AnimScriptInstance->Montage_Stop(0.0f);
 	}
+}
+
+UCameraComponent* AGamePlayCharacter::GetCamera()
+{
+	return FollowCamera;
 }

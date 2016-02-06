@@ -155,6 +155,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* ReloadAnim;
 
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponStat")
+	TSubclassOf<class AImpactEffect> ImpactEffect;
+
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float SpreadMin;
 
@@ -188,6 +191,9 @@ protected:
 
 	bool CanFire() const;
 
+	/** [local] weapon specific fire implementation */
+	virtual void FireWeapon() PURE_VIRTUAL(AShooterWeapon::FireWeapon, );
+
 public:
-	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& Transform, FHitResult& HitResult, FVector& EndLocation);
+	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation);
 };

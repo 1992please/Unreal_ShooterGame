@@ -83,7 +83,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SpawnWeaponsAndAssignToSlots();
 
-
+	UCameraComponent* GetCamera();
 
 protected:
 

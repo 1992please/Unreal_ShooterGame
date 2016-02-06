@@ -199,7 +199,7 @@ void AWeapon::OnBurstStarted()
 
 }
 
-void AWeapon::OnBurstFinished()
+void AWeapon::OnBurstFinished()	
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
 	if (MuzzlePSC != NULL)
@@ -238,7 +238,7 @@ void AWeapon::HandleFiring()
 
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
-			//FireWeapon();
+			FireWeapon();
 
 			UseAmmo();
 
@@ -319,7 +319,7 @@ bool AWeapon::CanFire() const
 	return (CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing);
 }
 
-void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& Transform, FHitResult& HitResult, FVector& EndLocation)
+void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation)
 {
 	// the End of the line trance by making some calculation of the forward vector of the camera taking into consideration the the current spread
 	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent) * 10000 + Camera->GetComponentLocation();
@@ -330,11 +330,11 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 	{
 		if (World->LineTraceSingleByChannel(Hit, Camera->GetComponentLocation(), LocalEndPoint, ECollisionChannel::ECC_Visibility))
 		{
-			Transform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
+			ProjectileTransform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
 		}
 		else
 		{
-			Transform = FTransform(Camera->GetComponentRotation() , WeaponFireSocketLocation, FVector(1, 1, 1));
+			ProjectileTransform = FTransform(Camera->GetComponentRotation() , WeaponFireSocketLocation, FVector(1, 1, 1));
 		}
 		HitResult = Hit;
 		EndLocation = Hit.ImpactPoint;
