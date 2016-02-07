@@ -47,16 +47,17 @@ void AWeaponRifle::FireWeapon()
 			if (TrailFX)
 			{
 				UParticleSystemComponent* Trail = UGameplayStatics::SpawnEmitterAtLocation(World, TrailFX, WeaponMesh->GetSocketLocation(MuzzleAttachPoint));
-				Trail->SetVectorParameter(TEXT("ShockBeamEnd"), EndLocation);
+				Trail->SetVectorParameter("ShockBeamEnd", EndLocation);
 			}
 
-			if (HitResult.bBlockingHit)
+			if (HitResult.bBlockingHit && ImpactEffect)
 			{
-				AImpactEffect* Impact = World->SpawnActorDeferred<AImpactEffect>(ImpactEffect, EndLocation, FRotator::ZeroRotator);
+				FTransform const SpawnTransform(HitResult.ImpactNormal.Rotation(), HitResult.ImpactPoint);
+				AImpactEffect* Impact = World->SpawnActorDeferred<AImpactEffect>(ImpactEffect, SpawnTransform);
 				if (Impact)
 				{
 					Impact->HitResult = HitResult;
-					Impact->FinishSpawning(FTransform(FRotator::ZeroRotator, EndLocation));
+					UGameplayStatics::FinishSpawningActor(Impact, SpawnTransform);
 				}
 			}
 		}

@@ -111,7 +111,10 @@ UShooterGameInstance* AGamePlayCharacter::GetShooterGameInstance()
 
 void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 {
-	const TArray<FWeaponBackpackItem>& WeaponBackpackItems = GetShooterGameInstance()->Backpack_Weapons;
+	UShooterGameInstance*const GameInstance = GetShooterGameInstance();
+	if(!GameInstance)
+		return;
+	const TArray<FWeaponBackpackItem>& WeaponBackpackItems = GameInstance->Backpack_Weapons;
 	UWorld* const World = GetWorld();
 	if (World)
 	{

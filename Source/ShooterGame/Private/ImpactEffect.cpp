@@ -7,23 +7,24 @@
 // Sets default values
 AImpactEffect::AImpactEffect()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
 
+	bAutoDestroyWhenFinished = true;
 	// Default Values
 	DecalSize = 2;
 	DecalLifeSpan = 3;
 }
 
 // Called when the game starts or when spawned
-void AImpactEffect::BeginPlay()
+void AImpactEffect::PostInitializeComponents()
 {
-	Super::BeginPlay();
-
+	Super::PostInitializeComponents();
+	SetLifeSpan(1);
 	// rotate the decal in the direction of the normal vector of the HitResult with random roll rotation
-	RandomDecalRotation = HitResult.Normal.Rotation() + FRotator(0, 0, FMath::RandRange(-180, 180));
+	RandomDecalRotation = HitResult.Normal.Rotation();
+	RandomDecalRotation.Roll = FMath::RandRange(-180.0f, 180.0f);
 
 	UWorld* World = GetWorld();
+
 	if (World && HitResult.PhysMaterial.IsValid())
 	{
 		switch (HitResult.PhysMaterial->SurfaceType)
@@ -61,12 +62,5 @@ void AImpactEffect::BeginPlay()
 
 		}
 	}
-}
-
-// Called every frame
-void AImpactEffect::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

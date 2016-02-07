@@ -9,9 +9,9 @@
 
 AGamePlayGameMode::AGamePlayGameMode()
 {
-	static ConstructorHelpers::FClassFinder<APawn> PawnAsset(TEXT("/Game/Blueprints/BP_GamePlayCharacter"));
+	/*static ConstructorHelpers::FClassFinder<APawn> PawnAsset(TEXT("/Game/Blueprints/BP_GamePlayCharacter"));
 	if (PawnAsset.Succeeded())
-		DefaultPawnClass = PawnAsset.Class;
+		DefaultPawnClass = PawnAsset.Class;*/
 	PlayerControllerClass = AGamePlayPlayerController::StaticClass();
 	GameStateClass = AGamePlayGameState::StaticClass();
 	HUDClass = AGamePlayHUD::StaticClass();

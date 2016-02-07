@@ -326,18 +326,27 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 	const FVector WeaponFireSocketLocation = WeaponMesh->GetSocketLocation(WeaponFireSocketName);
 	FHitResult Hit;
 	UWorld* World = GetWorld();
+
+	const FName TraceTag("MyTraceTag");
+
+	//World->DebugDrawTraceTag = TraceTag;
+
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.TraceTag = TraceTag;
+	CollisionParams.bReturnPhysicalMaterial = true;
 	if (World)
 	{
-		if (World->LineTraceSingleByChannel(Hit, Camera->GetComponentLocation(), LocalEndPoint, ECollisionChannel::ECC_Visibility))
+		if (World->LineTraceSingleByChannel(Hit, Camera->GetComponentLocation(), LocalEndPoint, ECollisionChannel::ECC_Visibility,CollisionParams))
 		{
 			ProjectileTransform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
+			EndLocation = Hit.ImpactPoint;
 		}
 		else
 		{
 			ProjectileTransform = FTransform(Camera->GetComponentRotation() , WeaponFireSocketLocation, FVector(1, 1, 1));
+			EndLocation = LocalEndPoint;
 		}
 		HitResult = Hit;
-		EndLocation = Hit.ImpactPoint;
 	}
 
 }
