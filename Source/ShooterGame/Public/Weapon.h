@@ -167,6 +167,15 @@ protected:
 	float SpreadCurrent;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	float SpreadDecreaseSpeed;
+
+	void IncreaseSpread(float IncreaseAmount);
+
+	void DecreaseSpread(float DecreaseAmount);
+
+
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	FAmmoData AmmoData;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)

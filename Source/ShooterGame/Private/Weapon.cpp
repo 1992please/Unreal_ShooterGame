@@ -8,7 +8,7 @@
 AWeapon::AWeapon()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
@@ -24,6 +24,7 @@ AWeapon::AWeapon()
 	CurrentState = EWeaponState::Idle;
 	LastFireTime = 0;
 	bPlayingFireAnim = false;
+	SpreadDecreaseSpeed = 0.1f;
 }
 
 void AWeapon::PostInitializeComponents()
@@ -48,6 +49,11 @@ void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Always decrease the spread to the SpreadMin
+	if (SpreadCurrent > SpreadMin)
+	{
+		DecreaseSpread(DeltaTime * SpreadDecreaseSpeed);
+	}
 }
 
 void AWeapon::StartFire()
@@ -322,7 +328,8 @@ bool AWeapon::CanFire() const
 void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation)
 {
 	// the End of the line trance by making some calculation of the forward vector of the camera taking into consideration the the current spread
-	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent) * 10000 + Camera->GetComponentLocation();
+	//SpreadCurrent = FMath::RandRange(SpreadMin, SpreadMax);
+	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent * PI/180) * 10000 + Camera->GetComponentLocation();
 	const FVector WeaponFireSocketLocation = WeaponMesh->GetSocketLocation(WeaponFireSocketName);
 	FHitResult Hit;
 	UWorld* World = GetWorld();
@@ -349,4 +356,30 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 		HitResult = Hit;
 	}
 
+}
+
+void AWeapon::IncreaseSpread(float IncreaseAmount)
+{
+	const float SpreadNew = SpreadCurrent + IncreaseAmount;
+	if (SpreadNew >= SpreadMax)
+	{
+		SpreadCurrent = SpreadMax;
+	}
+	else
+	{
+		SpreadCurrent = SpreadNew;
+	}
+}
+
+void AWeapon::DecreaseSpread(float DecreaseAmount)
+{
+	const float SpreadNew = SpreadCurrent - DecreaseAmount;
+	if (SpreadNew <= SpreadMin)
+	{
+		SpreadCurrent = SpreadMin;
+	}
+	else
+	{
+		SpreadCurrent = SpreadNew;
+	}
 }

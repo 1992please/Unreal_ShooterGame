@@ -62,4 +62,6 @@ void AWeaponRifle::FireWeapon()
 			}
 		}
 	}
+
+	IncreaseSpread(0.1);
 }
