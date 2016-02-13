@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameFramework/HUD.h"
+#include "STypes.h"
 #include "GamePlayHUD.generated.h"
 
 /**
@@ -50,7 +50,7 @@ protected:
 
 	/** Crosshair Icons (Left, top, right, bottom, Center */
 	UPROPERTY()
-	FCanvasIcon CrossHair[5];
+	FCanvasIcon Crosshair[5];
 
 	/** Crosshair indicator that we hit somone */
 	FCanvasIcon HitNotifyCrosshair;
@@ -73,9 +73,9 @@ protected:
 	UPROPERTY()
 	UFont* NormalFont;
 
-	/** General offset for HUD elements */
+	/** General Offset for HUD elements */
 	UPROPERTY()
-	float offset;
+	float Offset;
 
 	virtual void PostInitializeComponents() override;
 

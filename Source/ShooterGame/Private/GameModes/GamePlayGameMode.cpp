@@ -1,10 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ShooterGame.h"
-#include "GamePlayGameMode.h"
-#include "GamePlayCharacter.h"
-#include "GamePlayPlayerController.h"
-#include "GamePlayGameState.h"
 #include "GamePlayHUD.h"
 
 AGamePlayGameMode::AGamePlayGameMode()

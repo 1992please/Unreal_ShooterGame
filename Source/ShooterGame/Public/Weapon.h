@@ -2,7 +2,6 @@
 
 #pragma once
 #include "STypes.h"
-#include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
 namespace EWeaponState
@@ -49,7 +48,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = WeaponAttribute)
 	EWeaponType WeaponType;
 
-public:
 	/*
 	* How much ammo we have in the magazine
 	*/
@@ -61,6 +59,9 @@ public:
 	*/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = WeaponAttribute)
 	int32 CurrentAmmo;
+
+
+	float SpreadCurrent;
 
 public:
 	virtual void StartFire();
@@ -163,8 +164,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float SpreadMax;
-
-	float SpreadCurrent;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	float SpreadDecreaseSpeed;

@@ -3,4 +3,8 @@
 #pragma once
 
 #include "Engine.h"
+#include "GamePlayCharacter.h"
+#include "GamePlayGameMode.h"
+#include "GamePlayGameState.h"
+#include "GamePlayPlayerController.h"
 

@@ -2,7 +2,6 @@
 
 #pragma once
 #include "STypes.h"
-#include "GameFramework/PlayerController.h"
 #include "GamePlayPlayerController.generated.h"
 
 

@@ -2,7 +2,6 @@
 
 #include "ShooterGame.h"
 #include "Weapon.h"
-#include "GamePlayCharacter.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -329,7 +328,8 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 {
 	// the End of the line trance by making some calculation of the forward vector of the camera taking into consideration the the current spread
 	//SpreadCurrent = FMath::RandRange(SpreadMin, SpreadMax);
-	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent * PI/180) * 10000 + Camera->GetComponentLocation();
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::White, FString::Printf(TEXT("SpreadCurrent: %.2f"), SpreadCurrent));
+	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent) * 10000 + Camera->GetComponentLocation();
 	const FVector WeaponFireSocketLocation = WeaponMesh->GetSocketLocation(WeaponFireSocketName);
 	FHitResult Hit;
 	UWorld* World = GetWorld();
