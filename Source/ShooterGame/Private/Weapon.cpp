@@ -2,6 +2,8 @@
 
 #include "ShooterGame.h"
 #include "Weapon.h"
+#include "MyStaticLibrary.h"
+#include "TakeDamageInterface.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -334,16 +336,11 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 	FHitResult Hit;
 	UWorld* World = GetWorld();
 
-	const FName TraceTag("MyTraceTag");
 
 	//World->DebugDrawTraceTag = TraceTag;
-
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.TraceTag = TraceTag;
-	CollisionParams.bReturnPhysicalMaterial = true;
 	if (World)
 	{
-		if (World->LineTraceSingleByChannel(Hit, Camera->GetComponentLocation(), LocalEndPoint, ECollisionChannel::ECC_Visibility,CollisionParams))
+		if (UMyStaticLibrary::Trace(World, MyPawn,Camera->GetComponentLocation(), LocalEndPoint, Hit, ECollisionChannel::ECC_Visibility, true))
 		{
 			ProjectileTransform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
 			EndLocation = Hit.ImpactPoint;
@@ -381,5 +378,18 @@ void AWeapon::DecreaseSpread(float DecreaseAmount)
 	else
 	{
 		SpreadCurrent = SpreadNew;
+	}
+}
+
+void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& EndLocation)
+{
+	AActor* Actor = HitResult.GetActor();
+	if (Actor)
+	{
+		ITakeDamageInterface* Damaged = Cast<ITakeDamageInterface>(Actor);
+		if (Damaged)
+		{
+			Damaged->TakeDamage(AmmoData, DamageModifier, MyPawn, HitResult);
+		}
 	}
 }

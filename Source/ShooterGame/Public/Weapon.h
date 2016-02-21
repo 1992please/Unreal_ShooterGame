@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "STypes.h"
+//#include "STypes.h"
 #include "Weapon.generated.h"
 
 namespace EWeaponState
@@ -202,6 +202,10 @@ protected:
 	/** [local] weapon specific fire implementation */
 	virtual void FireWeapon() PURE_VIRTUAL(AShooterWeapon::FireWeapon, );
 
+	void AddDamageTo(FHitResult& HitResult, FVector& EndLocation);
+
+	UPROPERTY(EditDefaultsOnly, Category = DamageModifier)
+	FDamageModifier DamageModifier;
 public:
 	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation);
 };

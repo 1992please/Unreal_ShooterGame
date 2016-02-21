@@ -41,6 +41,8 @@ void AWeaponRifle::FireWeapon()
 
 		CalculateShootInformations(Camera, WeaponMesh, MuzzleAttachPoint, Transform, HitResult, EndLocation);
 
+		AddDamageTo(HitResult, EndLocation);
+
 		UWorld* const World = GetWorld();
 		if (World)
 		{

@@ -173,3 +173,25 @@ struct FWeaponBackpackItem
 		BackpackImage = nullptr;
 	}
 };
+
+USTRUCT()
+struct FDamageModifier
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	float MinWeaponDamageModifier;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MaxWeaponDemageModifier;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float CritDamageModifier;
+
+	FDamageModifier()
+	{
+		MinWeaponDamageModifier = .5f;
+		MaxWeaponDemageModifier = 1.0f;
+		CritDamageModifier = 2.0f;
+	}
+};

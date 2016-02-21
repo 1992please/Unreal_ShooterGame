@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "STypes.h"
+
 #include "GamePlayCharacter.generated.h"
 
 UCLASS()
