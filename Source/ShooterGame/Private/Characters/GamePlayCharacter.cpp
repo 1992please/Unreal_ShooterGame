@@ -14,12 +14,13 @@ AGamePlayCharacter::AGamePlayCharacter()
 	WeaponPullDownPercent = 0;
 
 	//Set Mesh Variables
-	GetMesh()->RelativeLocation.Z = -86.f;
-	GetMesh()->RelativeRotation.Yaw = -90.f;
-	GetMesh()->bOwnerNoSee = true;
-	GetMesh()->CastShadow = true;
-	GetMesh()->bCastDynamicShadow = true;
-	GetMesh()->bCastHiddenShadow = true;
+	USkeletalMeshComponent* Mesh = GetMesh();
+	Mesh->RelativeLocation.Z = -86.f;
+	Mesh->RelativeRotation.Yaw = -90.f;
+	Mesh->bOwnerNoSee = true;
+	Mesh->CastShadow = true;
+	Mesh->bCastDynamicShadow = true;
+	Mesh->bCastHiddenShadow = true;
 
 	//Set Camera Variables
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Follow Camera"));

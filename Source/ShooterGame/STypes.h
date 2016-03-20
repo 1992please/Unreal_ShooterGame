@@ -1,6 +1,11 @@
 #include "STypes.generated.h"
 #pragma once
 
+#define SURFACE_DEFAULT				SurfaceType_Default
+#define SURFACE_METAL				SurfaceType1
+#define SURFACE_GLASS				SurfaceType2
+#define SURFACE_CONCRETE			SurfaceType3
+#define SURFACE_FLESH				SurfaceType4
 
 namespace EShooterCrosshairDirection
 {

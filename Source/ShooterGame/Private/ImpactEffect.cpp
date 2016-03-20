@@ -18,6 +18,7 @@ AImpactEffect::AImpactEffect()
 void AImpactEffect::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
 	SetLifeSpan(1);
 	// rotate the decal in the direction of the normal vector of the HitResult with random roll rotation
 	RandomDecalRotation = HitResult.Normal.Rotation();
@@ -29,8 +30,10 @@ void AImpactEffect::PostInitializeComponents()
 	{
 		switch (HitResult.PhysMaterial->SurfaceType)
 		{
-			case EPhysicalSurface::SurfaceType_Default:
+			case SURFACE_DEFAULT:
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Default");
+
 				if (DefaultFX)
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(World, DefaultFX, HitResult.ImpactPoint, RandomDecalRotation);
@@ -47,8 +50,9 @@ void AImpactEffect::PostInitializeComponents()
 				}
 				break;
 			}
-			case EPhysicalSurface::SurfaceType1:
+			case SURFACE_FLESH:
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh");
 				break;
 			}
 			case EPhysicalSurface::SurfaceType2:
