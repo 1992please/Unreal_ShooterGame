@@ -180,6 +180,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	UParticleSystem* TrailFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = Damage)
+	TSubclassOf<class UDamageType> DamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category = Damage)
+	float HitDamage;
 
 	void DetermineWeaponState();
 
@@ -204,8 +209,9 @@ protected:
 
 	void AddDamageTo(FHitResult& HitResult, FVector& EndLocation);
 
-	UPROPERTY(EditDefaultsOnly, Category = DamageModifier)
-	FDamageModifier DamageModifier;
+
 public:
 	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation);
+
+	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
 };

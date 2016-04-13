@@ -1,11 +1,13 @@
 #include "STypes.generated.h"
 #pragma once
 
+
+#define COLLISION_WEAPON				ECC_GameTraceChannel1
+
 #define SURFACE_DEFAULT				SurfaceType_Default
-#define SURFACE_METAL				SurfaceType1
-#define SURFACE_GLASS				SurfaceType2
-#define SURFACE_CONCRETE			SurfaceType3
-#define SURFACE_FLESH				SurfaceType4
+#define SURFACE_BODY				SurfaceType1
+#define SURFACE_HEAD				SurfaceType2
+#define SURFACE_LIMB				SurfaceType3
 
 namespace EShooterCrosshairDirection
 {
@@ -176,27 +178,5 @@ struct FWeaponBackpackItem
 	{
 		WeaponToSpawn = nullptr;
 		BackpackImage = nullptr;
-	}
-};
-
-USTRUCT()
-struct FDamageModifier
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditDefaultsOnly)
-	float MinWeaponDamageModifier;
-
-	UPROPERTY(EditDefaultsOnly)
-	float MaxWeaponDemageModifier;
-	
-	UPROPERTY(EditDefaultsOnly)
-	float CritDamageModifier;
-
-	FDamageModifier()
-	{
-		MinWeaponDamageModifier = .5f;
-		MaxWeaponDemageModifier = 1.0f;
-		CritDamageModifier = 2.0f;
 	}
 };

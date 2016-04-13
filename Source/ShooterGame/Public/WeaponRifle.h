@@ -19,4 +19,5 @@ public:
 	virtual void BeginPlay() override;
 
 	void FireWeapon() override;
+
 };

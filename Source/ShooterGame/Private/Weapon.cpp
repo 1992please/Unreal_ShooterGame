@@ -3,7 +3,7 @@
 #include "ShooterGame.h"
 #include "Weapon.h"
 #include "MyStaticLibrary.h"
-#include "TakeDamageInterface.h"
+#include "ShooterDamageType.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -206,7 +206,7 @@ void AWeapon::OnBurstStarted()
 
 }
 
-void AWeapon::OnBurstFinished()	
+void AWeapon::OnBurstFinished()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Burst Finished");
 	if (MuzzlePSC != NULL)
@@ -279,7 +279,6 @@ void AWeapon::HandleFiring()
 
 void AWeapon::SimulateWeaponFire()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "simulate Fire");
 	// Particle Effects
 	if (MuzzleFX && (!bLoopedMuzzleFX || MuzzlePSC == NULL))
 	{
@@ -297,7 +296,6 @@ void AWeapon::SimulateWeaponFire()
 	if (bLoopedFireSound && FireAC == NULL && FireLoopSound)
 	{
 		FireAC = UGameplayStatics::SpawnSoundAttached(FireLoopSound, MyPawn->GetRootComponent());
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Sound");
 	}
 }
 
@@ -310,7 +308,6 @@ void AWeapon::UseAmmo()
 		{
 			CurrentAmmo--;
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Ammo: %d, AmmoInClip: %d"), CurrentAmmo, CurrentAmmoInClip));
 	}
 }
 
@@ -333,25 +330,21 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::White, FString::Printf(TEXT("SpreadCurrent: %.2f"), SpreadCurrent));
 	const FVector LocalEndPoint = FMath::VRandCone(Camera->GetForwardVector(), SpreadCurrent) * 10000 + Camera->GetComponentLocation();
 	const FVector WeaponFireSocketLocation = WeaponMesh->GetSocketLocation(WeaponFireSocketName);
-	FHitResult Hit;
-	UWorld* World = GetWorld();
 
 
+	FHitResult Impact = WeaponTrace(Camera->GetComponentLocation(), LocalEndPoint);
 	//World->DebugDrawTraceTag = TraceTag;
-	if (World)
+	if (Impact.bBlockingHit)
 	{
-		if (UMyStaticLibrary::Trace(World, MyPawn,Camera->GetComponentLocation(), LocalEndPoint, Hit, ECollisionChannel::ECC_Visibility, true))
-		{
-			ProjectileTransform = FTransform((Hit.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation , FVector(1, 1, 1));
-			EndLocation = Hit.ImpactPoint;
-		}
-		else
-		{
-			ProjectileTransform = FTransform(Camera->GetComponentRotation() , WeaponFireSocketLocation, FVector(1, 1, 1));
-			EndLocation = LocalEndPoint;
-		}
-		HitResult = Hit;
+		ProjectileTransform = FTransform((Impact.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation, FVector(1, 1, 1));
+		EndLocation = Impact.ImpactPoint;
 	}
+	else
+	{
+		ProjectileTransform = FTransform(Camera->GetComponentRotation(), WeaponFireSocketLocation, FVector(1, 1, 1));
+		EndLocation = LocalEndPoint;
+	}
+	HitResult = Impact;
 
 }
 
@@ -383,13 +376,48 @@ void AWeapon::DecreaseSpread(float DecreaseAmount)
 
 void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& EndLocation)
 {
-	AActor* Actor = HitResult.GetActor();
-	if (Actor)
+	if (!DamageType)
 	{
-		ITakeDamageInterface* Damaged = Cast<ITakeDamageInterface>(Actor);
-		if (Damaged)
+		return;
+	}
+	float ActualHitDamage = HitDamage;
+
+	/* Handle special damage location on the zombie body (types are setup in the Physics Asset of the zombie */
+	UShooterDamageType* DmgType = Cast<UShooterDamageType>(DamageType->GetDefaultObject());
+	UPhysicalMaterial * PhysMat = HitResult.PhysMaterial.Get();
+	if (PhysMat && DmgType)
+	{
+		if (PhysMat->SurfaceType == SURFACE_HEAD)
 		{
-			Damaged->TakeDamage(AmmoData, DamageModifier, MyPawn, HitResult);
+			ActualHitDamage *= DmgType->GetHeadDamageModifier();
+		}
+		else if (PhysMat->SurfaceType == SURFACE_LIMB)
+		{
+			ActualHitDamage *= DmgType->GetLimbDamageModifier();
 		}
 	}
+
+	FPointDamageEvent PointDmg;
+	PointDmg.DamageTypeClass = DamageType;
+	PointDmg.HitInfo = HitResult;
+	PointDmg.ShotDirection = (HitResult.ImpactPoint - EndLocation).GetSafeNormal();
+	PointDmg.Damage = ActualHitDamage;
+
+	AActor *Actor = HitResult.GetActor();
+	if (Actor)
+	{
+		Actor->TakeDamage(PointDmg.Damage, PointDmg, MyPawn->Controller, this);
+	}
+}
+
+FHitResult AWeapon::WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const
+{
+	FCollisionQueryParams TraceParams(TEXT("WeaponTrace"), true, Instigator);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceFrom, TraceTo, COLLISION_WEAPON, TraceParams);
+
+	return Hit;
 }

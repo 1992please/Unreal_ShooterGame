@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "TakeDamageInterface.h"
 #include "Enemy.generated.h"
 
 UCLASS()
-class SHOOTERGAME_API AEnemy : public ACharacter , public ITakeDamageInterface
+class SHOOTERGAME_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -31,8 +30,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = States)
 	float MaxHealth;
 
-	// returns true if the player is dead or not
-	bool HealthToModify(float HealthToModify);
-
 	void CalculateDamage(float Damage, float CritChance, float CritDamageModifier, FHitResult& HitInfo, float& OutDamageTaken, bool& OutWasCrit);
+
+	/* Take damage & handle death */
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 };

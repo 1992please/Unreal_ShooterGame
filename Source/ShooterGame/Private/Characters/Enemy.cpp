@@ -2,7 +2,7 @@
 
 #include "ShooterGame.h"
 #include "Enemy.h"
-
+#include "ShooterDamageType.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -33,14 +33,6 @@ void AEnemy::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 }
 
-bool AEnemy::HealthToModify(float HealthToModify)
-{
-	CurrentHealth = FMath::Max(0.0f, CurrentHealth - HealthToModify);
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::SanitizeFloat(CurrentHealth));
-
-	return !CurrentHealth;
-}
-
 void AEnemy::CalculateDamage(float Damage, float CritChance, float CritDamageModifier, FHitResult& HitInfo, float& OutDamageTaken, bool& OutWasCrit)
 {
 	if (FMath::FRand() < CritChance)
@@ -60,4 +52,50 @@ void AEnemy::CalculateDamage(float Damage, float CritChance, float CritDamageMod
 	}
 }
 
+float AEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	if (CurrentHealth <= 0.f)
+	{
+		return 0.f;
+	}
 
+	/* Modify based based on gametype rules */
+	AGamePlayGameMode* MyGameMode = Cast<AGamePlayGameMode>(GetWorld()->GetAuthGameMode());
+	//Damage = MyGameMode ? MyGameMode->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : Damage;
+
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (ActualDamage > 0.f)
+	{
+		CurrentHealth -= ActualDamage;
+		if (CurrentHealth <= 0)
+		{
+			bool bCanDie = true;
+
+			/* Check the damagetype, always allow dying if the cast fails, otherwise check the property if player can die from damagetype */
+			if (DamageEvent.DamageTypeClass)
+			{
+				UShooterDamageType* DmgType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+				bCanDie = (DmgType == nullptr || (DmgType && DmgType->GetCanDieFrom()));
+			}
+
+			if (bCanDie)
+			{
+				//Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+			}
+			else
+			{
+				/* Player cannot die from this damage type, set hitpoints to 1.0 */
+				CurrentHealth = 1.0f;
+			}
+		}
+		else
+		{
+			/* Shorthand for - if x != null pick1 else pick2 */
+			APawn* Pawn = EventInstigator ? EventInstigator->GetPawn() : nullptr;
+			//PlayHit(ActualDamage, DamageEvent, Pawn, DamageCauser, false);
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::SanitizeFloat(CurrentHealth));
+
+	return ActualDamage;
+}

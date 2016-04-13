@@ -50,17 +50,11 @@ void AImpactEffect::PostInitializeComponents()
 				}
 				break;
 			}
-			case SURFACE_FLESH:
+			case SURFACE_HEAD:
+			case SURFACE_BODY:
+			case SURFACE_LIMB:
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh");
-				break;
-			}
-			case EPhysicalSurface::SurfaceType2:
-			{
-				break;
-			}
-			case EPhysicalSurface::SurfaceType3:
-			{
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh " +  HitResult.BoneName.ToString());
 				break;
 			}
 
