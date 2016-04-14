@@ -34,4 +34,9 @@ public:
 
 	/* Take damage & handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	/* The thinking part of the brain, steers our zombie and makes decisions based on the data we feed it from the Blackboard */
+	/* Assigned at the Character level (instead of Controller) so we may use different zombie behaviors while re-using one controller. */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class UBehaviorTree* BehaviorTree;
 };
