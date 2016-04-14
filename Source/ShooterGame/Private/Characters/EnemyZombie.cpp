@@ -61,7 +61,14 @@ void AEnemyZombie::OnRetriggerMeleeStrike()
 {
 }
 
-bool AEnemyZombie::IsSprinting() const
+
+void AEnemyZombie::PlayHit(bool bKilled)
 {
-	return false;
+	Super::PlayHit(bKilled);
+
+	/* Stop playing the hunting sound */
+	if (AudioLoopComp && bKilled)
+	{
+		AudioLoopComp->Stop();
+	}
 }

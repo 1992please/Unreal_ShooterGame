@@ -2,11 +2,11 @@
 
 #pragma once
 
-
+#include "BaseCharacter.h"
 #include "GamePlayCharacter.generated.h"
 
 UCLASS()
-class SHOOTERGAME_API AGamePlayCharacter : public ACharacter
+class SHOOTERGAME_API AGamePlayCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 

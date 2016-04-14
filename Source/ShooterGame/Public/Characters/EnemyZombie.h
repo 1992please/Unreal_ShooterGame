@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Enemy.h"
+#include "BaseCharacter.h"
 #include "EnemyZombie.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SHOOTERGAME_API AEnemyZombie : public AEnemy
+class SHOOTERGAME_API AEnemyZombie : public ABaseCharacter
 {
 	GENERATED_BODY()
 	
@@ -21,8 +21,6 @@ class SHOOTERGAME_API AEnemyZombie : public AEnemy
 	virtual void Tick(float DeltaSeconds) override;
 
 protected:
-
-	virtual bool IsSprinting() const;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Attacking")
 	UCapsuleComponent* MeleeCollisionComp;
@@ -76,10 +74,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* SoundAttackMelee;
 
+	virtual void PlayHit(bool bKilled) override;
 public:
 
 	AEnemyZombie();
 
 	UPROPERTY(BlueprintReadWrite, Category = "Attacking")
 	bool bIsPunching;
+
+	/* The thinking part of the brain, steers our zombie and makes decisions based on the data we feed it from the Blackboard */
+	/* Assigned at the Character level (instead of Controller) so we may use different zombie behaviors while re-using one controller. */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class UBehaviorTree* BehaviorTree;
 };

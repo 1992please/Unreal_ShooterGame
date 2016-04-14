@@ -2,7 +2,7 @@
 
 #include "ShooterGame.h"
 #include "ZombieAIController.h"
-#include "Enemy.h"
+#include "EnemyZombie.h"
 
 /* AI Specific includes */
 #include "BehaviorTree/BehaviorTree.h"
@@ -27,7 +27,7 @@ void AZombieAIController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
 
-	AEnemy* Enemy = Cast<AEnemy>(InPawn);
+	AEnemyZombie* Enemy = Cast<AEnemyZombie>(InPawn);
 	if (Enemy)
 	{
 		if (Enemy->BehaviorTree->BlackboardAsset)

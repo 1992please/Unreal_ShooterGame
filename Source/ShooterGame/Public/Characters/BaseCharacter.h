@@ -14,15 +14,39 @@ public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	USoundCue* SoundTakeHit;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	USoundCue* SoundDeath;
 
-	
-	
+	UFUNCTION(BlueprintCallable, Category = "CharacterCondition")
+	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "CharacterCondition")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "CharacterCondition")
+	bool IsAlive() const;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
+	float Health;
+
+	/* Take damage & handle death */
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	virtual bool CanDie() const;
+
+	virtual bool Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser);
+
+	virtual void OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser);
+
+	virtual void FellOutOfWorld(const class UDamageType& DmgType) override;
+
+	virtual void SetRagdollPhysics();
+
+	virtual void PlayHit(bool bKilled);
+
+	bool bIsDying;
 };

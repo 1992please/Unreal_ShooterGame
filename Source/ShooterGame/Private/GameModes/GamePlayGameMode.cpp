@@ -13,3 +13,8 @@ AGamePlayGameMode::AGamePlayGameMode()
 	HUDClass = AGamePlayHUD::StaticClass();
 }
 
+void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType)
+{
+	// Do nothing (can we used to apply score or keep track of kill count)
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, "Enemy Killed");
+}

@@ -15,5 +15,6 @@ class SHOOTERGAME_API AGamePlayGameMode : public AGameMode
 	AGamePlayGameMode();
 	
 	
-	
+public:
+	virtual void Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType);
 };
