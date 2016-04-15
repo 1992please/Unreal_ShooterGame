@@ -207,11 +207,11 @@ protected:
 	/** [local] weapon specific fire implementation */
 	virtual void FireWeapon() PURE_VIRTUAL(AShooterWeapon::FireWeapon, );
 
-	void AddDamageTo(FHitResult& HitResult, FVector& EndLocation);
+	void AddDamageTo(FHitResult& HitResult, FVector& StartLocation);
 
 
 public:
-	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation);
+	void CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& StartLocation);
 
 	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
 };

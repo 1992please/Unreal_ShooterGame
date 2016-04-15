@@ -323,7 +323,7 @@ bool AWeapon::CanFire() const
 	return (CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing);
 }
 
-void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& EndLocation)
+void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneComponent* WeaponMesh, FName WeaponFireSocketName, FTransform& ProjectileTransform, FHitResult& HitResult, FVector& StartLocation)
 {
 	// the End of the line trance by making some calculation of the forward vector of the camera taking into consideration the the current spread
 	//SpreadCurrent = FMath::RandRange(SpreadMin, SpreadMax);
@@ -337,12 +337,11 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 	if (Impact.bBlockingHit)
 	{
 		ProjectileTransform = FTransform((Impact.ImpactPoint - WeaponFireSocketLocation).Rotation(), WeaponFireSocketLocation, FVector(1, 1, 1));
-		EndLocation = Impact.ImpactPoint;
 	}
 	else
 	{
 		ProjectileTransform = FTransform(Camera->GetComponentRotation(), WeaponFireSocketLocation, FVector(1, 1, 1));
-		EndLocation = LocalEndPoint;
+		Impact.ImpactPoint = LocalEndPoint;
 	}
 	HitResult = Impact;
 
@@ -374,7 +373,7 @@ void AWeapon::DecreaseSpread(float DecreaseAmount)
 	}
 }
 
-void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& EndLocation)
+void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& StartLocation)
 {
 	if (!DamageType)
 	{
@@ -400,9 +399,9 @@ void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& EndLocation)
 	FPointDamageEvent PointDmg;
 	PointDmg.DamageTypeClass = DamageType;
 	PointDmg.HitInfo = HitResult;
-	PointDmg.ShotDirection = (HitResult.ImpactPoint - EndLocation).GetSafeNormal();
+	PointDmg.ShotDirection = (StartLocation - HitResult.ImpactPoint).GetSafeNormal();
 	PointDmg.Damage = ActualHitDamage;
-
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan, PointDmg.ShotDirection.ToString());
 	AActor *Actor = HitResult.GetActor();
 	if (Actor)
 	{

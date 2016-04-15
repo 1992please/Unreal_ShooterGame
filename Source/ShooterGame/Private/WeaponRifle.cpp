@@ -36,12 +36,11 @@ void AWeaponRifle::FireWeapon()
 	if (WeaponMesh && Camera)
 	{
 		FHitResult HitResult;
-		FVector EndLocation;
 		FTransform Transform;
+		FVector StartLocation;
+		CalculateShootInformations(Camera, WeaponMesh, MuzzleAttachPoint, Transform, HitResult, StartLocation);
 
-		CalculateShootInformations(Camera, WeaponMesh, MuzzleAttachPoint, Transform, HitResult, EndLocation);
-
-		AddDamageTo(HitResult, EndLocation);
+		AddDamageTo(HitResult, StartLocation);
 
 		UWorld* const World = GetWorld();
 		if (World)
@@ -49,7 +48,7 @@ void AWeaponRifle::FireWeapon()
 			if (TrailFX)
 			{
 				UParticleSystemComponent* Trail = UGameplayStatics::SpawnEmitterAtLocation(World, TrailFX, WeaponMesh->GetSocketLocation(MuzzleAttachPoint));
-				Trail->SetVectorParameter("ShockBeamEnd", EndLocation);
+				Trail->SetVectorParameter("ShockBeamEnd", HitResult.ImpactPoint);
 			}
 
 			if (HitResult.bBlockingHit && ImpactEffect)

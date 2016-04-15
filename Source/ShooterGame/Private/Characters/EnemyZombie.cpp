@@ -18,6 +18,7 @@ AEnemyZombie::AEnemyZombie()
 
 
 }
+
 void AEnemyZombie::BeginPlay()
 {
 	Super::BeginPlay();

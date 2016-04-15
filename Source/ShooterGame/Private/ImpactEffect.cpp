@@ -32,7 +32,7 @@ void AImpactEffect::PostInitializeComponents()
 		{
 			case SURFACE_DEFAULT:
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Default");
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Default");
 
 				if (DefaultFX)
 				{
@@ -54,7 +54,7 @@ void AImpactEffect::PostInitializeComponents()
 			case SURFACE_BODY:
 			case SURFACE_LIMB:
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh " +  HitResult.BoneName.ToString());
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh " +  HitResult.BoneName.ToString());
 				break;
 			}
 

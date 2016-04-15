@@ -69,7 +69,7 @@ float ABaseCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		else
 		{
 			/* Shorthand for - if x != null pick1 else pick2 */
-			APawn* Pawn = EventInstigator ? EventInstigator->GetPawn() : nullptr;
+			//APawn* Pawn = EventInstigator ? EventInstigator->GetPawn() : nullptr;
 			PlayHit(false);
 		}
 	}
@@ -147,14 +147,14 @@ void ABaseCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEven
 	SetActorEnableCollision(true);
 
 	SetRagdollPhysics();
-
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "WTFFFFFFFFF");
 	/* Apply physics impulse on the bone of the enemy skeleton mesh we hit (ray-trace damage only) */
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		FPointDamageEvent PointDmg = *((FPointDamageEvent*)(&DamageEvent));
 		{
 			// TODO: Use DamageTypeClass->DamageImpulse
-			Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * 12000, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
+			Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * 120000, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
 		}
 	}
 	if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
@@ -181,25 +181,23 @@ void ABaseCharacter::PlayHit(bool bKilled)
 
 void ABaseCharacter::SetRagdollPhysics()
 {
-	bool bInRagdoll = false;
 	USkeletalMeshComponent* Mesh3P = GetMesh();
 
-	if (IsPendingKill())
-	{
-		bInRagdoll = false;
-	}
-	else if (!Mesh3P || !Mesh3P->GetPhysicsAsset())
-	{
-		bInRagdoll = false;
-	}
-	else
+	if (!IsPendingKill() || Mesh3P || Mesh3P->GetPhysicsAsset())
 	{
 		Mesh3P->SetAllBodiesSimulatePhysics(true);
 		Mesh3P->SetSimulatePhysics(true);
 		Mesh3P->WakeAllRigidBodies();
 		Mesh3P->bBlendPhysics = true;
 
-		bInRagdoll = true;
+		SetLifeSpan(10.0f);
+	}
+	else
+	{
+		// Immediately hide the pawn
+		TurnOff();
+		SetActorHiddenInGame(true);
+		SetLifeSpan(1.0f);
 	}
 
 	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
@@ -208,17 +206,5 @@ void ABaseCharacter::SetRagdollPhysics()
 		CharacterComp->StopMovementImmediately();
 		CharacterComp->DisableMovement();
 		CharacterComp->SetComponentTickEnabled(false);
-	}
-
-	if (!bInRagdoll)
-	{
-		// Immediately hide the pawn
-		TurnOff();
-		SetActorHiddenInGame(true);
-		SetLifeSpan(1.0f);
-	}
-	else
-	{
-		SetLifeSpan(10.0f);
 	}
 }
