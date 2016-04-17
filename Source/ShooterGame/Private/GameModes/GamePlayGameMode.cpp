@@ -2,12 +2,14 @@
 
 #include "ShooterGame.h"
 #include "GamePlayHUD.h"
+#include "ShooterPlayerState.h"
 
 AGamePlayGameMode::AGamePlayGameMode()
 {
 	/*static ConstructorHelpers::FClassFinder<APawn> PawnAsset(TEXT("/Game/Blueprints/BP_GamePlayCharacter"));
 	if (PawnAsset.Succeeded())
 		DefaultPawnClass = PawnAsset.Class;*/
+	PlayerStateClass = AShooterPlayerState::StaticClass();
 	PlayerControllerClass = AGamePlayPlayerController::StaticClass();
 	GameStateClass = AGamePlayGameState::StaticClass();
 	HUDClass = AGamePlayHUD::StaticClass();

@@ -68,8 +68,8 @@ private:
 	void InputAxisMouseX(float AxisVal);
 
 public:
-	UPROPERTY()
-	TSubclassOf<class UUserWidget> ChangeSensitivityWidget;
+	//UPROPERTY()
+	//TSubclassOf<class UUserWidget> ChangeSensitivityWidget;
 	UPROPERTY()
 	TSubclassOf<class UUserWidget> WeaponSelectionWidget;
 };

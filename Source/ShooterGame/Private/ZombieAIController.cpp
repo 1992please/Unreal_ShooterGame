@@ -15,12 +15,11 @@ AZombieAIController::AZombieAIController()
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComp"));
 
 	/* Match with the AI/ZombieBlackboard */
-	PatrolLocationKeyName = "PatrolLocation";
 	CurrentWaypointKeyName = "CurrentWaypoint";
-	BotTypeKeyName = "BotType";
 	TargetEnemyKeyName = "TargetEnemy";
 
-
+	/* Initializes PlayerState so we can assign a team index to AI */
+	bWantsPlayerState = true;
 }
 
 void AZombieAIController::Possess(APawn* InPawn)

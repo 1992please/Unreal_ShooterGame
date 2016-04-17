@@ -93,7 +93,7 @@ void AEnemyZombie::OnSeePlayer(APawn* Pawn)
 
 void AEnemyZombie::PlaySoundLoop()
 {
-	PlayCharacterSound(SoundPlayerNoticed);
+	PlayCharacterSound(SoundHunting);
 }
 
 void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
@@ -120,7 +120,10 @@ void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
 
 			if (MyPS && OtherPS)
 			{
-				if (MyPS->GetTeamNumber() == OtherPS->GetTeamNumber())
+				// TODO Use TeamNumbers to identify Allies
+
+				//if (MyPS->GetTeamNumber() == OtherPS->GetTeamNumber())
+				if(!OtherPS->bIsABot)
 				{
 					/* Do not attack other zombies. */
 					return;
@@ -160,6 +163,7 @@ void AEnemyZombie::SimulateMeleeStrike()
 
 void AEnemyZombie::OnMeleeCompBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Attack");
 	/* Stop any running attack timers */
 	TimerHandle_MeleeAttack.Invalidate();
 

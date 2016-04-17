@@ -19,9 +19,9 @@ AGamePlayPlayerController::AGamePlayPlayerController()
 	GyroSensitivityCurrent = 40.f;
 
 	// Set the widget
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassAsset(TEXT("WidgetBlueprint'/Game/UI/UI_Debug_ChangeSensitivity'"));
-	if(WidgetClassAsset.Succeeded())
-		ChangeSensitivityWidget = WidgetClassAsset.Class;
+	//static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassAsset(TEXT("WidgetBlueprint'/Game/UI/UI_Debug_ChangeSensitivity'"));
+	//if(WidgetClassAsset.Succeeded())
+	//	ChangeSensitivityWidget = WidgetClassAsset.Class;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassAsset1(TEXT("WidgetBlueprint'/Game/UI/Blueprints/UI_Debug_WeaponSelection'"));
 	if (WidgetClassAsset1.Succeeded())
@@ -30,14 +30,14 @@ AGamePlayPlayerController::AGamePlayPlayerController()
 
 void AGamePlayPlayerController::Tick(float DeltaSeconds)
 {
-	if (WasInputKeyJustPressed(EKeys::Q))
-	{
-		UUserWidget*const TempWidget = CreateWidget<UUserWidget>(GetWorld(), ChangeSensitivityWidget);
-		TempWidget->AddToViewport();
-		FInputModeUIOnly Mode;
-		SetInputMode(Mode);
-		bShowMouseCursor = true;
-	}
+	//if (WasInputKeyJustPressed(EKeys::Q))
+	//{
+	//	UUserWidget*const TempWidget = CreateWidget<UUserWidget>(GetWorld(), ChangeSensitivityWidget);
+	//	TempWidget->AddToViewport();
+	//	FInputModeUIOnly Mode;
+	//	SetInputMode(Mode);
+	//	bShowMouseCursor = true;
+	//}
 	//if (WasInputKeyJustPressed(EKeys::R))
 	//{
 	//	UUserWidget*const TempWidget = CreateWidget<UUserWidget>(GetWorld(), WeaponSelectionWidget);

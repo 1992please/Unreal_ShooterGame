@@ -28,13 +28,7 @@ class SHOOTERGAME_API AZombieAIController : public AAIController
 	FName TargetEnemyKeyName;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	FName PatrolLocationKeyName;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	FName CurrentWaypointKeyName;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	FName BotTypeKeyName;
 
 public:
 	ATargetPoint* GetWaypoint();
