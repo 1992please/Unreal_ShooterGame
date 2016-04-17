@@ -29,6 +29,10 @@ protected:
 	UFUNCTION()
 	void OnMeleeCompBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	void PlaySoundLoop();
+
+	void OnSeePlayer(APawn* Pawn);
+
 	void OnRetriggerMeleeStrike();
 
 	/* Deal damage to the Actor that was hit by the punch animation */

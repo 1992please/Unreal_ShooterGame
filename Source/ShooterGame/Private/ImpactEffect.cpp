@@ -55,6 +55,15 @@ void AImpactEffect::PostInitializeComponents()
 			case SURFACE_LIMB:
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Flesh " +  HitResult.BoneName.ToString());
+				if (FleshFX)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(World, FleshFX, HitResult.ImpactPoint, RandomDecalRotation);
+				}
+
+				if (FleshSound)
+				{
+					UGameplayStatics::SpawnSoundAtLocation(World, FleshSound, HitResult.ImpactPoint);
+				}
 				break;
 			}
 

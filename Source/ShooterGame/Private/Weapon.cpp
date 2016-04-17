@@ -344,7 +344,7 @@ void AWeapon::CalculateShootInformations(UCameraComponent* Camera, USceneCompone
 		Impact.ImpactPoint = LocalEndPoint;
 	}
 	HitResult = Impact;
-
+	StartLocation = WeaponFireSocketLocation;
 }
 
 void AWeapon::IncreaseSpread(float IncreaseAmount)
@@ -399,9 +399,9 @@ void AWeapon::AddDamageTo(FHitResult& HitResult, FVector& StartLocation)
 	FPointDamageEvent PointDmg;
 	PointDmg.DamageTypeClass = DamageType;
 	PointDmg.HitInfo = HitResult;
-	PointDmg.ShotDirection = (StartLocation - HitResult.ImpactPoint).GetSafeNormal();
+	PointDmg.ShotDirection = (HitResult.ImpactPoint - StartLocation).GetSafeNormal();
 	PointDmg.Damage = ActualHitDamage;
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan, PointDmg.ShotDirection.ToString());
+	//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan, PointDmg.ShotDirection.ToString());
 	AActor *Actor = HitResult.GetActor();
 	if (Actor)
 	{

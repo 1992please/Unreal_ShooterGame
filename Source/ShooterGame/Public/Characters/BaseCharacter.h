@@ -42,6 +42,8 @@ protected:
 
 	virtual void OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser);
 
+	virtual void ApplyPhysicsToTheRagdolledBody(FDamageEvent const& DamageEvent);
+
 	virtual void FellOutOfWorld(const class UDamageType& DmgType) override;
 
 	virtual void SetRagdollPhysics();
