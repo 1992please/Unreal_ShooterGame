@@ -200,7 +200,6 @@ void AGamePlayCharacter::TimeLineWeaponDown()
 	// We can show weapon when hands are down
 	ShowWeapon(BindingToBeEquiped);
 
-
 	// Set current weapon after equipping
 	CurrentWeapon = BindingToBeEquiped;
 }
@@ -218,7 +217,7 @@ void AGamePlayCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
 {
 	if (FPPMesh && AnimMontage && FPPMesh->AnimScriptInstance && FPPMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
 	{
-		FPPMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOutTime);
+		FPPMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOut.GetBlendTime());
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Stoping anim montage");
 }

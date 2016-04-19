@@ -46,7 +46,7 @@ void AImpactEffect::PostInitializeComponents()
 
 				if (DefaultDecalMat && HitResult.Component.IsValid())
 				{
-					UGameplayStatics::SpawnDecalAttached(DefaultDecalMat, FVector(DecalSize, DecalSize, 1.0f), HitResult.Component.Get(), HitResult.BoneName, HitResult.ImpactPoint, RandomDecalRotation, EAttachLocation::KeepWorldPosition, DecalLifeSpan);
+					UGameplayStatics::SpawnDecalAttached(DefaultDecalMat, FVector(1.0f, DecalSize, DecalSize), HitResult.Component.Get(), HitResult.BoneName, HitResult.ImpactPoint, RandomDecalRotation, EAttachLocation::KeepWorldPosition, DecalLifeSpan);
 				}
 				break;
 			}
