@@ -93,7 +93,8 @@ void AEnemyZombie::OnSeePlayer(APawn* Pawn)
 
 void AEnemyZombie::PlaySoundLoop()
 {
-	PlayCharacterSound(SoundHunting);
+	AudioLoopComp->SetSound(SoundHunting);
+	AudioLoopComp->Play();
 }
 
 void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
