@@ -124,7 +124,7 @@ void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
 				// TODO Use TeamNumbers to identify Allies
 
 				//if (MyPS->GetTeamNumber() == OtherPS->GetTeamNumber())
-				if(OtherPS->bIsABot)
+				if(!OtherPS->bIsABot)
 				{
 					/* Do not attack other zombies. */
 					return;
