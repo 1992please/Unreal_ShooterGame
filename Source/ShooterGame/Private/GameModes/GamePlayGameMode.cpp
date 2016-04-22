@@ -24,7 +24,7 @@ void AGamePlayGameMode::BeginPlay()
 	Super::BeginPlay();
 	TArray<AActor*> SV;
 	UGameplayStatics::GetAllActorsOfClass(this, ASpawnVolume::StaticClass(), SV);
-	SpawnNewBot(Cast<ASpawnVolume>(SV[0])->GetRandomPointInVolume(), FRotator::ZeroRotator, BotToSpawn);
+	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 4, 5);
 }
 
 void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType)
@@ -33,7 +33,7 @@ void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, A
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, "Enemy Killed");
 }
 
-void AGamePlayGameMode::SpawnNewBot(FVector SpawnLocation, FRotator SpawnRotation, TSubclassOf<AEnemyZombie> Bot)
+void AGamePlayGameMode::SpawnNewBot(FVector SpawnLocation, FRotator SpawnRotation, TSubclassOf<ABaseCharacter> Bot)
 {
 	UWorld* const World = GetWorld();
 	if (World && Bot)
@@ -41,7 +41,7 @@ void AGamePlayGameMode::SpawnNewBot(FVector SpawnLocation, FRotator SpawnRotatio
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.Instigator = Instigator;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		AEnemyZombie* Zombie = World->SpawnActor<AEnemyZombie>(Bot, SpawnLocation, SpawnRotation, SpawnInfo);
+		ABaseCharacter* Zombie = World->SpawnActor<ABaseCharacter>(Bot, SpawnLocation, SpawnRotation, SpawnInfo);
 		Zombie->SpawnDefaultController();
 	}
 }

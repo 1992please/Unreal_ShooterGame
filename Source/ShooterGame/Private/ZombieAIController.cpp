@@ -24,8 +24,7 @@ AZombieAIController::AZombieAIController()
 
 void AZombieAIController::Possess(APawn* InPawn)
 {
-	Super::Possess(InPawn);
-
+	// IT'S REALLY IMPORTANT to initialize the black board before the calling the base possess function 
 	AEnemyZombie* Enemy = Cast<AEnemyZombie>(InPawn);
 	if (Enemy)
 	{
@@ -35,6 +34,8 @@ void AZombieAIController::Possess(APawn* InPawn)
 		}
 		BehaviorComp->StartTree(*Enemy->BehaviorTree);
 	}
+
+	Super::Possess(InPawn);
 }
 
 void AZombieAIController::UnPossess()

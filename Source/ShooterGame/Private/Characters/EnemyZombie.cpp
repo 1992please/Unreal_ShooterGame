@@ -59,6 +59,17 @@ void AEnemyZombie::BeginPlay()
 		PS->bIsABot = true;
 	}
 
+}
+
+void AEnemyZombie::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+}
+
+void AEnemyZombie::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
 	// Start Making the zombie chase the player
 	UWorld* World = GetWorld();
 	if (World)
@@ -71,11 +82,6 @@ void AEnemyZombie::BeginPlay()
 		}
 	}
 
-}
-
-void AEnemyZombie::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
 
 }
 
@@ -87,6 +93,7 @@ void AEnemyZombie::OnSeePlayer(APawn* Pawn)
 	ABaseCharacter* SensedPawn = Cast<ABaseCharacter>(Pawn);
 	if (AIController && SensedPawn->IsAlive())
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "AssignedController");
 		AIController->SetTargetEnemy(SensedPawn);
 	}
 }
@@ -136,6 +143,7 @@ void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
 				FPointDamageEvent DmgEvent;
 				DmgEvent.DamageTypeClass = PunchDamageType;
 				DmgEvent.Damage = MeleeDamage;
+				GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Attack");
 
 				HitActor->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
 
@@ -164,7 +172,6 @@ void AEnemyZombie::SimulateMeleeStrike()
 
 void AEnemyZombie::OnMeleeCompBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Attack");
 	/* Stop any running attack timers */
 	TimerHandle_MeleeAttack.Invalidate();
 
