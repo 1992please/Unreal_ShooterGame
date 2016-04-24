@@ -24,7 +24,7 @@ void AGamePlayGameMode::BeginPlay()
 	Super::BeginPlay();
 	TArray<AActor*> SV;
 	UGameplayStatics::GetAllActorsOfClass(this, ASpawnVolume::StaticClass(), SV);
-	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 1, 1);
+	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 5, 60);
 }
 
 void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType)
