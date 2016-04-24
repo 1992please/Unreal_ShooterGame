@@ -21,6 +21,16 @@ namespace EShooterCrosshairDirection
 	};
 }
 
+// enum to store the current state of gameplay
+UENUM(BlueprintType)
+enum class EPlayState
+{
+	EPlaying,
+	EGameOver,
+	EWon,
+	EUnknown
+};
+
 namespace EShooterHudPosition
 {
 	enum Type

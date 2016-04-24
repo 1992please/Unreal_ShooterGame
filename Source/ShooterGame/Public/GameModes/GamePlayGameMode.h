@@ -5,25 +5,8 @@
 #include "GameFramework/GameMode.h"
 #include "GamePlayGameMode.generated.h"
 
-// enum to store the current state of gameplay
-UENUM(BlueprintType)
-enum class EPlayState
-{
-	EPlaying,
-	EGameOver,
-	EWon,
-	EUnknown
-};
 
-// enum to store the current state of gameplay
-UENUM(BlueprintType)
-enum class EBGamePlayStage
-{
-	EPlaying,
-	EGameOver,
-	EWon,
-	EUnknown
-};
+
 /**
  * 
  */

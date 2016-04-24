@@ -102,6 +102,8 @@ protected:
 	UFUNCTION()
 	void TimeLineWeaponDown();
 
+	virtual void PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser) override;
+
 private:
 	UPROPERTY()
 	class AWeapon* BindingToBeEquiped;

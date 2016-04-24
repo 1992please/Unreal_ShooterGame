@@ -4,13 +4,14 @@
 #include "GamePlayCharacter.h"
 #include "ShooterGameInstance.h"
 #include "Weapon.h"
+#include "GamePlayHUD.h"
 
 // Sets default values
 AGamePlayCharacter::AGamePlayCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	WeaponPullDownPercent = 0;
 
 	//Set Mesh Variables
@@ -234,4 +235,25 @@ void AGamePlayCharacter::StopAllAnimMontages()
 UCameraComponent* AGamePlayCharacter::GetCamera()
 {
 	return FollowCamera;
+}
+
+void AGamePlayCharacter::PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
+{
+	Super::PlayHit(bKilled, DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
+	AGamePlayPlayerController* MyPC = Cast<AGamePlayPlayerController>(Controller);
+	AGamePlayHUD* MyHUD = MyPC ? Cast<AGamePlayHUD>(MyPC->GetHUD()) : NULL;
+	if (MyHUD)
+	{
+		MyHUD->NotifyGotHit(DamageTaken, DamageEvent, PawnInstigator);
+	}
+
+	if (CurrentWeapon && bKilled)
+	{
+		CurrentWeapon->GetRootComponent()->DetachFromParent();
+		USkeletalMeshComponent* WeaponMesh = CurrentWeapon->WeaponMesh;
+		if (WeaponMesh)
+		{
+			WeaponMesh->SetSimulatePhysics(true);
+		}
+	}
 }

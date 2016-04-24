@@ -24,13 +24,18 @@ void AGamePlayGameMode::BeginPlay()
 	Super::BeginPlay();
 	TArray<AActor*> SV;
 	UGameplayStatics::GetAllActorsOfClass(this, ASpawnVolume::StaticClass(), SV);
-	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 4, 5);
+	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 1, 1);
 }
 
 void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType)
 {
+	AShooterPlayerState* VictimPS = Cast<AShooterPlayerState>(VictimPawn->PlayerState);
+	AShooterPlayerState* KillerPS = Cast<AShooterPlayerState>(Killer->PlayerState);
 	// Do nothing (can we used to apply score or keep track of kill count)
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, "Enemy Killed");
+	if (VictimPS && VictimPS->bIsABot)
+	{
+		KillerPS->AddKill();
+	}
 }
 
 void AGamePlayGameMode::SpawnNewBot(FVector SpawnLocation, FRotator SpawnRotation, TSubclassOf<ABaseCharacter> Bot)

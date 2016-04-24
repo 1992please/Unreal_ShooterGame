@@ -10,7 +10,6 @@ ABaseCharacter::ABaseCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
-
 	Health = 100;
 }
 
@@ -23,6 +22,7 @@ float ABaseCharacter::GetMaxHealth() const
 {
 	// Retrieve the default value of the health property that is assigned on instantiation.
 	return GetClass()->GetDefaultObject<ABaseCharacter>()->Health;
+
 }
 
 bool ABaseCharacter::IsAlive() const
@@ -67,7 +67,7 @@ float ABaseCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 			{
 				/* Shorthand for - if x != null pick1 else pick2 */
 				//APawn* Pawn = EventInstigator ? EventInstigator->GetPawn() : nullptr;
-				PlayHit(false);
+				PlayHit(false, ActualDamage, DamageEvent, EventInstigator->GetPawn(), DamageCauser);
 			}
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::SanitizeFloat(Health));
@@ -134,7 +134,7 @@ void ABaseCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEven
 	bTearOff = true;
 	bIsDying = true;
 
-	PlayHit(true);
+	PlayHit(true, KillingDamage, DamageEvent, PawnInstigator, DamageCauser);
 
 	DetachFromControllerPendingDestroy();
 
@@ -178,7 +178,7 @@ void ABaseCharacter::ApplyPhysicsToTheRagdolledBody(FDamageEvent const& DamageEv
 	}
 }
 
-void ABaseCharacter::PlayHit(bool bKilled)
+void ABaseCharacter::PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
 {
 	if (bKilled && SoundDeath)
 	{

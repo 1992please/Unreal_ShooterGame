@@ -93,7 +93,6 @@ void AEnemyZombie::OnSeePlayer(APawn* Pawn)
 	ABaseCharacter* SensedPawn = Cast<ABaseCharacter>(Pawn);
 	if (AIController && SensedPawn->IsAlive())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "AssignedController");
 		AIController->SetTargetEnemy(SensedPawn);
 	}
 }
@@ -143,7 +142,6 @@ void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
 				FPointDamageEvent DmgEvent;
 				DmgEvent.DamageTypeClass = PunchDamageType;
 				DmgEvent.Damage = MeleeDamage;
-				GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, "Attack");
 
 				HitActor->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
 
@@ -204,10 +202,9 @@ void AEnemyZombie::OnRetriggerMeleeStrike()
 }
 
 
-void AEnemyZombie::PlayHit(bool bKilled)
+void AEnemyZombie::PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
 {
-	Super::PlayHit(bKilled);
-
+	Super::PlayHit(bKilled, DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
 	/* Stop playing the hunting sound */
 	if (AudioLoopComp && bKilled)
 	{

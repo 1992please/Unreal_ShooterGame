@@ -14,6 +14,7 @@ ASpawnVolume::ASpawnVolume()
 	// Create the Spawn Box
 	WhereToSpawn = CreateDefaultSubobject<UBoxComponent>(TEXT("WhereToSpawn"));
 	RootComponent = WhereToSpawn;
+	WhereToSpawn->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Create ArrowComponent
 	UArrowComponent*const Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ForwardArrow"));
@@ -71,7 +72,7 @@ void ASpawnVolume::SpawnZombie()
 		UWorld* const World = GetWorld();
 		if (World)
 		{
-			AGamePlayGameMode* const GameMode = Cast<AGamePlayGameMode>(World->GetAuthGameMode());
+			//AGamePlayGameMode* const GameMode = Cast<AGamePlayGameMode>(World->GetAuthGameMode());
 			for (TSubclassOf<ABaseCharacter> WhatToSpawn : ZombiesToSpawn)
 			{
 				// if we have set something to spawn;
@@ -88,9 +89,9 @@ void ASpawnVolume::SpawnZombie()
 					FVector SpawnLocation = GetRandomPointInVolume();
 					FRotator SpawnRotation = FRotator::ZeroRotator;
 					// spawn the pickup
-					//ABaseCharacter* const Character = World->SpawnActor<ABaseCharacter>(WhatToSpawn, SpawnLocation, GetActorRotation(), SpawnParams);
-					//Character->SpawnDefaultController();
-					GameMode->SpawnNewBot(SpawnLocation, SpawnRotation, WhatToSpawn);
+					ABaseCharacter* const Character = World->SpawnActor<ABaseCharacter>(WhatToSpawn, SpawnLocation, GetActorRotation(), SpawnParams);
+					Character->SpawnDefaultController();
+					//GameMode->SpawnNewBot(SpawnLocation, SpawnRotation, WhatToSpawn);
 					if (--NoOfZombiesToSpawn > 0)
 					{
 						SpawnDelay = FMath::FRandRange(MinSpawnDelay, MaxSpawnDelay);

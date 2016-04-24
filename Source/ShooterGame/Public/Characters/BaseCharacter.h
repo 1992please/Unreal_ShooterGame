@@ -48,7 +48,7 @@ protected:
 
 	virtual void SetRagdollPhysics();
 
-	virtual void PlayHit(bool bKilled);
+	virtual void PlayHit(bool bKilled , float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
 
 	bool bIsDying;
 };

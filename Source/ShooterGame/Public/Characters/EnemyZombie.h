@@ -79,7 +79,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* SoundAttackMelee;
 
-	virtual void PlayHit(bool bKilled) override;
+	virtual void PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser) override;
 public:
 
 	AEnemyZombie();
