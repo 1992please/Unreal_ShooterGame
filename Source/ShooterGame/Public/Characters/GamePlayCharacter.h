@@ -46,18 +46,19 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		UCameraComponent* FollowCamera;
+	UCameraComponent* FollowCamera;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* FPPMesh;
-
+	USkeletalMeshComponent* FPPMesh;
 public:
-	UPROPERTY()
-	class AWeapon* WeaponSlot1;
-	UPROPERTY()
-	class AWeapon* WeaponSlot2;
-	UPROPERTY()
-	class AWeapon* WeaponSlot3;
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<class AWeapon> WeaponSlot1;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<class AWeapon> WeaponSlot2;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<class AWeapon> WeaponSlot3;
 
 	UPROPERTY(BlueprintReadWrite, Category = Weapon)
 	class AWeapon* CurrentWeapon;
@@ -78,33 +79,13 @@ public:
 	float WeaponPullDownPercent;
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void EquipWeapon(class AWeapon* WhichWeapon);
-
-	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SpawnWeaponsAndAssignToSlots();
 
 	UCameraComponent* GetCamera();
 
 protected:
 
-	UFUNCTION(BlueprintPure, Category = Utility)
-	class UShooterGameInstance* GetShooterGameInstance();
-
-	/**
-	*	Show the weapon as an Event in the middle of the animation
-	*/
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void ShowWeapon(class AWeapon* WeaponToShow);
-
-	FTimeline Timeline;
-	UFUNCTION()
-	void TimeLineChangeProgress(float Value);
-	UFUNCTION()
-	void TimeLineWeaponDown();
-
 	virtual void PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser) override;
 
-private:
-	UPROPERTY()
-	class AWeapon* BindingToBeEquiped;
+	virtual void OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser) override;
 };

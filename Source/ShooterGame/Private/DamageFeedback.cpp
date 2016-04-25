@@ -22,6 +22,5 @@ void ADamageFeedback::BeginPlay()
 void ADamageFeedback::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
 }
 

@@ -26,7 +26,6 @@ protected:
 	/**
 	*	Some Control Properties
 	*/
-	EControllingDevice CurrentControllingDevice;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
 	float MouseSensitivityMin;
@@ -34,25 +33,8 @@ protected:
 	float MouseSensitivityMax;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
 	float MouseSensitivityCurrent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float TouchSensitivityMin;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float TouchSensitivityMax;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float TouchSensitivityCurrent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float GyroSensitivityMin;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float GyroSensitivityMax;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Controls)
-	float GyroSensitivityCurrent;
 
 public:
-	UFUNCTION(BlueprintPure, Category = Controls)
-	EControllingDevice GetCurrentControllingDevice() const;
-
-	UFUNCTION(BlueprintCallable, Category = Controls)
-	void SeCurrentState(const EControllingDevice NewControllingDevice);
 
 	UFUNCTION(BlueprintPure, Category = Controls)
 	float GetSensitivity() const;
@@ -67,9 +49,4 @@ private:
 	void InputAxisMouseY(float AxisVal);
 	void InputAxisMouseX(float AxisVal);
 
-public:
-	//UPROPERTY()
-	//TSubclassOf<class UUserWidget> ChangeSensitivityWidget;
-	UPROPERTY()
-	TSubclassOf<class UUserWidget> WeaponSelectionWidget;
 };

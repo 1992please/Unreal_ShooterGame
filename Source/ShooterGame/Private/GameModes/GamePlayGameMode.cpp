@@ -10,6 +10,7 @@
 
 AGamePlayGameMode::AGamePlayGameMode()
 {
+	PrimaryActorTick.bCanEverTick = false;
 	/*static ConstructorHelpers::FClassFinder<APawn> PawnAsset(TEXT("/Game/Blueprints/BP_GamePlayCharacter"));
 	if (PawnAsset.Succeeded())
 		DefaultPawnClass = PawnAsset.Class;*/
@@ -17,14 +18,86 @@ AGamePlayGameMode::AGamePlayGameMode()
 	PlayerControllerClass = AGamePlayPlayerController::StaticClass();
 	GameStateClass = AGamePlayGameState::StaticClass();
 	HUDClass = AGamePlayHUD::StaticClass();
+
 }
 
 void AGamePlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	TArray<AActor*> SV;
-	UGameplayStatics::GetAllActorsOfClass(this, ASpawnVolume::StaticClass(), SV);
-	Cast<ASpawnVolume>(SV[0])->StartSpawning(BotsToSpawn, 1, 5, 60);
+
+	UWorld* World = GetWorld();
+	SpawnVolumes.Empty();
+	// Initialize the SpawnVolumes Array
+	if (World)
+	{
+		for (TActorIterator<ASpawnVolume>It(World); It; ++It)
+		{
+			SpawnVolumes.Add(*It);
+		}
+	}
+
+	// for test
+	SpawnVolumes[0]->StartSpawning(BotsToSpawn, .5f, .5f, 2);
+
+	CurrentState = EPlayState::EPlaying;
+}
+
+void AGamePlayGameMode::Tick(float DeltaSeconds)
+{
+}
+
+void AGamePlayGameMode::SetGameState(EPlayState NewPlayState)
+{
+	CurrentState = NewPlayState;
+
+	HandleCurrentState();
+}
+
+void AGamePlayGameMode::HandleCurrentState()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		AGamePlayHUD* HUD = Cast<AGamePlayHUD>(World->GetFirstPlayerController()->GetHUD());
+		if (HUD)
+		{
+			HUD->SetPlayState(CurrentState);
+		}
+	}
+
+	
+}
+
+void AGamePlayGameMode::HandleCurrentGamePlayStage()
+{
+	switch (CurrentGameStage)
+	{
+		case EGamePlayState::Stage1:
+		{
+
+		}
+		break;
+		case EGamePlayState::Stage2:
+		{
+
+		}
+		break;
+		case EGamePlayState::Stage3:
+		{
+
+		}
+		break;
+		case EGamePlayState::Stage4:
+		{
+
+		}
+		break;
+		default:
+		{
+
+		}
+		break;
+	}
 }
 
 void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, APawn* VictimPawn, const UDamageType* DamageType)
@@ -35,18 +108,43 @@ void AGamePlayGameMode::Killed(AController* Killer, AController* VictimPlayer, A
 	if (VictimPS && VictimPS->bIsABot)
 	{
 		KillerPS->AddKill();
+		if (CheckFinishedSpawning() && !CheckAnyZombieAlive())
+		{
+			SetGameState(EPlayState::EWon);
+		}
+	}
+	else
+	{
+		SetGameState(EPlayState::EGameOver);
 	}
 }
 
-void AGamePlayGameMode::SpawnNewBot(FVector SpawnLocation, FRotator SpawnRotation, TSubclassOf<ABaseCharacter> Bot)
+bool AGamePlayGameMode::CheckFinishedSpawning()
 {
-	UWorld* const World = GetWorld();
-	if (World && Bot)
+	for (auto& SpawnVolume : SpawnVolumes)
 	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.Instigator = Instigator;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		ABaseCharacter* Zombie = World->SpawnActor<ABaseCharacter>(Bot, SpawnLocation, SpawnRotation, SpawnInfo);
-		Zombie->SpawnDefaultController();
+		if (SpawnVolume->IsSpawning())
+		{
+			return false;
+		}
 	}
+
+	return true;
+}
+
+bool AGamePlayGameMode::CheckAnyZombieAlive()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		for (TActorIterator<AEnemyZombie>It(World); It; ++It)
+		{
+			if (!It->IsDying())
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

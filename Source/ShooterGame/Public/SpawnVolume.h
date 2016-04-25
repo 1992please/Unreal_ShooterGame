@@ -30,6 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	void StartSpawning(TArray< TSubclassOf<class ABaseCharacter> > &NewZombies, float NewMinDelay = 1.0f, float NewMaxDelay = 4.5f, int32 NoOfZombies = 1);
+
+	bool IsSpawning();
 protected:
 	/* the pickup to spawn */
 	UPROPERTY(EditAnywhere, Category = "Spawning")
@@ -59,4 +61,7 @@ protected:
 	float SpawnDelay;
 
 	void SpawnPickup();
+
+
+	bool bIsSpawning;
 };

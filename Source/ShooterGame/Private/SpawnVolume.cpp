@@ -24,6 +24,7 @@ ASpawnVolume::ASpawnVolume()
 	MaxSpawnDelay = 4.5f;
 	MinSpawnDelay = 1.0f;
 	NoOfZombiesToSpawn = 1;
+	bIsSpawning = false;
 }
 
 // Called when the game starts or when spawned
@@ -32,6 +33,11 @@ void ASpawnVolume::BeginPlay()
 	Super::BeginPlay();
 
 	//SpawnZombie();
+}
+
+bool ASpawnVolume::IsSpawning()
+{
+	return bIsSpawning;
 }
 
 void ASpawnVolume::StartSpawning(TArray< TSubclassOf<class ABaseCharacter> > &NewZombies, float NewMinDelay, float NewMaxDelay, int32 NoOfZombies)
@@ -45,6 +51,7 @@ void ASpawnVolume::StartSpawning(TArray< TSubclassOf<class ABaseCharacter> > &Ne
 	SpawnDelay = FMath::FRandRange(MinSpawnDelay, MaxSpawnDelay);
 	SpawnTimer.Invalidate();
 	GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolume::SpawnZombie, SpawnDelay, false);
+	bIsSpawning = true;
 }
 
 // Called every frame
@@ -96,6 +103,10 @@ void ASpawnVolume::SpawnZombie()
 					{
 						SpawnDelay = FMath::FRandRange(MinSpawnDelay, MaxSpawnDelay);
 						GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolume::SpawnZombie, SpawnDelay, false);
+					}
+					else
+					{
+						bIsSpawning = false;
 					}
 				}
 			}

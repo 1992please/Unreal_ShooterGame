@@ -196,13 +196,17 @@ void AGamePlayHUD::DrawKills()
 		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
 
 		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, HUDLight);
-		TextItem.EnableShadow(FLinearColor::Black);
+		//TextItem.EnableShadow(FLinearColor::Black);
 		TextItem.Text = FText::FromString(Text);
 		TextItem.Scale = FVector2D(TextScale * ScaleUI, TextScale * ScaleUI);
-		TextItem.FontRenderInfo = ShadowedFont;
+		//TextItem.FontRenderInfo = ShadowedFont;
 		//TextItem.SetColor(HUDDark);
 
-		Canvas->DrawItem(TextItem, KillsPosX + Offset * ScaleUI + KillsIcon.UL * 1.5f * ScaleUI, KillsPosY + (KillsBg.VL * ScaleUI - SizeY * TextScale * ScaleUI) / 2);
+		Canvas->DrawItem(
+			TextItem,
+			KillsPosX + Offset * ScaleUI + KillsIcon.UL * 1.5f * ScaleUI,
+			KillsPosY + (KillsBg.VL * ScaleUI - SizeY * TextScale * ScaleUI) / 2
+		);
 
 		// Draw the Number
 		Text = FString::FromInt(MyPlayerState->GetKills());
@@ -212,7 +216,10 @@ void AGamePlayHUD::DrawKills()
 		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
 		TextItem.Text = FText::FromString(Text);
 		TextItem.Scale = FVector2D(TextScale * ScaleUI, TextScale * ScaleUI);
-		Canvas->DrawItem(TextItem, KillsPosX + KillsBg.UL * ScaleUI - (BoxWidth + SizeX * TextScale * ScaleUI) / 2, KillsPosY + (KillsBg.VL* ScaleUI - SizeY * TextScale * ScaleUI) / 2);
+		Canvas->DrawItem(
+			TextItem, KillsPosX + KillsBg.UL * ScaleUI - (BoxWidth + SizeX * TextScale * ScaleUI) / 2,
+			KillsPosY + (KillsBg.VL* ScaleUI - SizeY * TextScale * ScaleUI) / 2
+		);
 
 	}
 }
@@ -313,6 +320,53 @@ void AGamePlayHUD::MakeUV(FCanvasIcon& Icon, FVector2D& UV0, FVector2D& UV1, uin
 	}
 }
 
+void AGamePlayHUD::DrawEndOfGameScreen()
+{
+	AGamePlayPlayerController* MyPC = Cast<AGamePlayPlayerController>(PlayerOwner);
+	AShooterPlayerState* MyPlayerState = Cast<AShooterPlayerState>(MyPC->PlayerState);
+
+	if (MyPlayerState)
+	{
+		Canvas->SetDrawColor(HUDLight);
+		const float CenterX = Canvas->ClipX / 2;
+		const float CenterY = Canvas->ClipY / 2;
+
+		// Draw the Headline Text
+		float TextScale = 1.0f;
+		float SizeX, SizeY;
+		FString Text = PlayState == EPlayState::EWon? "Ma3alem" : "Batee5a";
+		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, HUDLight);
+		//TextItem.EnableShadow(FLinearColor::Black);
+		TextItem.Text = FText::FromString(Text);
+		TextItem.Scale = FVector2D(TextScale * ScaleUI, TextScale * ScaleUI);
+		//TextItem.FontRenderInfo = ShadowedFont;
+		//TextItem.SetColor(HUDDark);
+
+		Canvas->DrawItem(
+			TextItem,
+			CenterX - SizeX * TextScale * ScaleUI / 2,
+			CenterY - SizeY * TextScale * ScaleUI - Offset * ScaleUI
+		);
+
+		// Draw the Number
+		Text = "Score: " + FString::FromInt(MyPlayerState->GetKills());
+
+		TextScale = 0.7f;
+		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+		TextItem.Text = FText::FromString(Text);
+		TextItem.Scale = FVector2D(TextScale * ScaleUI, TextScale * ScaleUI);
+		Canvas->DrawItem(
+			TextItem,
+			CenterX - SizeX * TextScale * ScaleUI / 2,
+			CenterY + SizeY * TextScale * ScaleUI + Offset * ScaleUI
+		);
+
+
+	}
+}
+
 void AGamePlayHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -333,5 +387,10 @@ void AGamePlayHUD::DrawHUD()
 		DrawHitIndicator();
 		DrawKills();
 	}
+	else
+	{
+		DrawEndOfGameScreen();
+	}
 
 }
+

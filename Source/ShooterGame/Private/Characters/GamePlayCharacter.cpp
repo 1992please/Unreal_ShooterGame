@@ -10,7 +10,7 @@
 AGamePlayCharacter::AGamePlayCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	bUseControllerRotationYaw = true;
 	WeaponPullDownPercent = 0;
 
@@ -22,6 +22,7 @@ AGamePlayCharacter::AGamePlayCharacter()
 	Mesh->CastShadow = true;
 	Mesh->bCastDynamicShadow = true;
 	Mesh->bCastHiddenShadow = true;
+
 
 	//Set Camera Variables
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Follow Camera"));
@@ -37,17 +38,6 @@ AGamePlayCharacter::AGamePlayCharacter()
 	FPPMesh->RelativeRotation = FRotator(0, -90, 0);
 	FPPMesh->bOnlyOwnerSee = true;
 	FPPMesh->CastShadow = false;
-
-	//SetTimeLine
-	static const ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("CurveFloat'/Game/Data/ChangeWeaponCurve.ChangeWeaponCurve'"));
-	Timeline = FTimeline();
-	FOnTimelineFloat ProgressFunction;
-	ProgressFunction.BindUFunction(this, FName(TEXT("TimeLineChangeProgress")));
-	Timeline.AddInterpFloat(Curve.Object, ProgressFunction);
-
-	FOnTimelineEvent WeaponDownEvent;
-	WeaponDownEvent.BindUFunction(this, TEXT("TimeLineWeaponDown"));
-	Timeline.AddEvent(.5f, WeaponDownEvent);
 }
 
 // Called when the game starts or when spawned
@@ -55,26 +45,12 @@ void AGamePlayCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnWeaponsAndAssignToSlots();
-	//EquipWeapon(WeaponSlot1);
 }
 
 // Called every frame
 void AGamePlayCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bisChangingWeapon)
-	{
-		if (Timeline.IsPlaying())
-		{
-			Timeline.TickTimeline(DeltaTime);
-		}
-		else
-		{
-			bisChangingWeapon = false;
-		}
-	}
-
 }
 
 // Called to bind functionality to input
@@ -102,108 +78,25 @@ void AGamePlayCharacter::OnStopFire()
 
 void AGamePlayCharacter::OnReload()
 {
-	if(CurrentWeapon)
+	if (CurrentWeapon)
 		CurrentWeapon->StartReload();
-}
-
-UShooterGameInstance* AGamePlayCharacter::GetShooterGameInstance()
-{
-	return Cast<UShooterGameInstance>(GetGameInstance());
 }
 
 void AGamePlayCharacter::SpawnWeaponsAndAssignToSlots()
 {
-	UShooterGameInstance*const GameInstance = GetShooterGameInstance();
-	if(!GameInstance)
-		return;
-	const TArray<FWeaponBackpackItem>& WeaponBackpackItems = GameInstance->Backpack_Weapons;
 	UWorld* const World = GetWorld();
 	if (World)
 	{
-		for (int index = 0; index < WeaponBackpackItems.Num(); index++)
+		CurrentWeapon = World->SpawnActorDeferred<AWeapon>(WeaponSlot1, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		if (WeaponSlot1)
 		{
-			switch (WeaponBackpackItems[index].InSlot)
-			{
-				case 1:
-				{
-					WeaponSlot1 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					if (WeaponSlot1)
-					{
-						//WeaponSlot1->IndexInBackpack = index;
-						WeaponSlot1->SetOwningPawn(this);
-						UGameplayStatics::FinishSpawningActor(WeaponSlot1, GetTransform());
-						WeaponSlot1->AttachRootComponentTo(FPPMesh, WeaponSlot1->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
-					}
-					break;
-				}
-				case 2:
-				{
-					WeaponSlot2 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					if (WeaponSlot2)
-					{
-						WeaponSlot2->SetOwningPawn(this);
-						//WeaponSlot2->IndexInBackpack = index;
-						UGameplayStatics::FinishSpawningActor(WeaponSlot2, GetTransform());
-						WeaponSlot2->AttachRootComponentTo(FPPMesh, WeaponSlot2->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
-					}
-					break;
-				}
-				case 3:
-				{
-					WeaponSlot3 = World->SpawnActorDeferred<AWeapon>(WeaponBackpackItems[index].WeaponToSpawn, GetTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					if (WeaponSlot3)
-					{
-						WeaponSlot3->SetOwningPawn(this);
-
-						//WeaponSlot3->IndexInBackpack = index;
-						UGameplayStatics::FinishSpawningActor(WeaponSlot3, GetTransform());
-						WeaponSlot3->AttachRootComponentTo(FPPMesh, WeaponSlot3->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
-					}
-					break;
-				}
-			}
+			//WeaponSlot1->IndexInBackpack = index;
+			CurrentWeapon->SetOwningPawn(this);
+			UGameplayStatics::FinishSpawningActor(CurrentWeapon, GetTransform());
+			CurrentWeapon->AttachRootComponentTo(FPPMesh, CurrentWeapon->AttachSocketNameFPP, EAttachLocation::SnapToTargetIncludingScale);
 		}
 	}
 	// Set Current Weapon
-	ShowWeapon(WeaponSlot1);
-	CurrentWeapon = WeaponSlot1;
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "SpawnWeaponsAndAssignToSlots");
-}
-
-void AGamePlayCharacter::ShowWeapon(AWeapon* WeaponToShow)
-{
-	WeaponSlot1->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot1));
-	WeaponSlot2->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot2));
-	WeaponSlot3->SetActorHiddenInGame(!(WeaponToShow == WeaponSlot3));
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Show Weapon");
-}
-
-void AGamePlayCharacter::EquipWeapon(AWeapon* WhichWeapon)
-{
-	if (WhichWeapon == CurrentWeapon || bisChangingWeapon)
-		return;
-
-	bisChangingWeapon = true;
-
-	BindingToBeEquiped = WhichWeapon;
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Equipe Weapon");
-	Timeline.PlayFromStart();
-}
-
-void AGamePlayCharacter::TimeLineChangeProgress(float Value)
-{
-	WeaponPullDownPercent = Value;
-}
-
-void AGamePlayCharacter::TimeLineWeaponDown()
-{
-	// We can show weapon when hands are down
-	ShowWeapon(BindingToBeEquiped);
-
-
-	// Set current weapon after equipping
-	CurrentWeapon = BindingToBeEquiped;
 }
 
 float AGamePlayCharacter::PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName)
@@ -246,14 +139,20 @@ void AGamePlayCharacter::PlayHit(bool bKilled, float DamageTaken, struct FDamage
 	{
 		MyHUD->NotifyGotHit(DamageTaken, DamageEvent, PawnInstigator);
 	}
+}
 
-	if (CurrentWeapon && bKilled)
+void AGamePlayCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser)
+{
+	Super::OnDeath(KillingDamage, DamageEvent, PawnInstigator, DamageCauser);
+	if (CurrentWeapon)
 	{
 		CurrentWeapon->GetRootComponent()->DetachFromParent();
 		USkeletalMeshComponent* WeaponMesh = CurrentWeapon->WeaponMesh;
 		if (WeaponMesh)
 		{
 			WeaponMesh->SetSimulatePhysics(true);
+			WeaponMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
+			WeaponMesh->AddAngularImpulse(FVector(1000, 500, 0));
 		}
 	}
 }

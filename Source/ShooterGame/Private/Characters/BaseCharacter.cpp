@@ -107,6 +107,8 @@ bool ABaseCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, A
 	{
 		return false;
 	}
+	bIsDying = true;
+
 
 	Health = FMath::Min(0.0f, Health);
 
@@ -125,14 +127,8 @@ bool ABaseCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, A
 
 void ABaseCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser)
 {
-	if (bIsDying)
-	{
-		return;
-	}
-
 	bReplicateMovement = false;
 	bTearOff = true;
-	bIsDying = true;
 
 	PlayHit(true, KillingDamage, DamageEvent, PawnInstigator, DamageCauser);
 
@@ -218,4 +214,9 @@ void ABaseCharacter::SetRagdollPhysics()
 		CharacterComp->DisableMovement();
 		CharacterComp->SetComponentTickEnabled(false);
 	}
+}
+
+bool ABaseCharacter::IsDying()
+{
+	return bIsDying;
 }

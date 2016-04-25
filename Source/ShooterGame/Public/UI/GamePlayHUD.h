@@ -166,6 +166,8 @@ protected:
 
 	void DrawCrosshair();
 
+	void DrawEndOfGameScreen();
+
 	/** helper for getting uv coords in normalized top,left, bottom, right format */
 	void MakeUV(FCanvasIcon& Icon, FVector2D& UV0, FVector2D& UV1, uint16 U, uint16 V, uint16 UL, uint16 VL);
 };

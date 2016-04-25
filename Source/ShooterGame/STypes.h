@@ -23,12 +23,21 @@ namespace EShooterCrosshairDirection
 
 // enum to store the current state of gameplay
 UENUM(BlueprintType)
-enum class EPlayState
+enum class EPlayState :uint8
 {
 	EPlaying,
 	EGameOver,
 	EWon,
 	EUnknown
+};
+
+UENUM(BlueprintType)
+enum class SpawnTag
+{
+	Right,
+	Left,
+	Back,
+	Forwar
 };
 
 namespace EShooterHudPosition
@@ -45,14 +54,6 @@ namespace EShooterHudPosition
 		BackLeft = 7,
 	};
 }
-
-UENUM(BlueprintType)
-enum class EControllingDevice : uint8
-{
-	Mouse,
-	Touch,
-	Gyro
-};
 
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
@@ -148,45 +149,5 @@ struct FAmmoData
 		CritChance = 0;
 		DamageOverTime = 0;
 		DamageOverTime_TimeLeft = 0;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct FWeaponBackpackItem
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class AWeapon> WeaponToSpawn;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* BackpackImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsSelected;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 InSlot;
-
-	FWeaponBackpackItem()
-	{
-		WeaponToSpawn = NULL;
-		BackpackImage = NULL;
-		IsSelected = false;
-		InSlot = 0;
-	}
-
-	FWeaponBackpackItem(UTexture2D* Image, TSubclassOf<class AWeapon> Weapon, int inSlot)
-	{
-		WeaponToSpawn = Weapon;
-		BackpackImage = Image;
-		IsSelected = false;
-		InSlot = inSlot;
-	}
-
-	void Destroy()
-	{
-		WeaponToSpawn = nullptr;
-		BackpackImage = nullptr;
 	}
 };

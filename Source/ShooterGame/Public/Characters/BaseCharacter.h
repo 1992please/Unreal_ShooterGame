@@ -29,6 +29,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CharacterCondition")
 	bool IsAlive() const;
 
+	bool IsDying();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
 	float Health;
