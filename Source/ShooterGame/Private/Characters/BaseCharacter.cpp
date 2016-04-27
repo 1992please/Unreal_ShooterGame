@@ -11,6 +11,8 @@ ABaseCharacter::ABaseCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
 	Health = 100;
+	TimeAfterDeathBeforeDestroy = 10;
+	bRagdolledAfterDeath = false;
 }
 
 float ABaseCharacter::GetHealth() const
@@ -139,37 +141,41 @@ void ABaseCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEven
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	USkeletalMeshComponent* Mesh3P = GetMesh();
-	if (Mesh3P)
+	if(bRagdolledAfterDeath)
 	{
-		Mesh3P->SetCollisionProfileName(TEXT("Ragdoll"));
+		SetRagdollPhysics();
+
+		ApplyPhysicsToTheRagdolledBody(DamageEvent);
 	}
-	SetActorEnableCollision(true);
+	else
+	{
+		SetLifeSpan(TimeAfterDeathBeforeDestroy);
+	}
 
-	SetRagdollPhysics();
-
-	ApplyPhysicsToTheRagdolledBody(DamageEvent);
 }
 
 void ABaseCharacter::ApplyPhysicsToTheRagdolledBody(FDamageEvent const& DamageEvent)
 {
-	USkeletalMeshComponent* Mesh3P = GetMesh();
-	if (Mesh3P)
+	if (bRagdolledAfterDeath)
 	{
-		/* Apply physics impulse on the bone of the enemy skeleton mesh we hit (ray-trace damage only) */
-		if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+		USkeletalMeshComponent* Mesh3P = GetMesh();
+		if (Mesh3P)
 		{
-			FPointDamageEvent PointDmg = *((FPointDamageEvent*)&DamageEvent);
+			/* Apply physics impulse on the bone of the enemy skeleton mesh we hit (ray-trace damage only) */
+			if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+			{
+				FPointDamageEvent PointDmg = *((FPointDamageEvent*)&DamageEvent);
 
-			// TODO: Use DamageTypeClass->DamageImpulse
-			Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * 12000, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
+				// TODO: Use DamageTypeClass->DamageImpulse
+				Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * 12000, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
 
-		}
-		if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
-		{
-			FRadialDamageEvent RadialDmg = *((FRadialDamageEvent const*)(&DamageEvent));
+			}
+			if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+			{
+				FRadialDamageEvent RadialDmg = *((FRadialDamageEvent const*)(&DamageEvent));
 
-			Mesh3P->AddRadialImpulse(RadialDmg.Origin, RadialDmg.Params.GetMaxRadius(), 100000 /*RadialDmg.DamageTypeClass->DamageImpulse*/, ERadialImpulseFalloff::RIF_Linear);
+				Mesh3P->AddRadialImpulse(RadialDmg.Origin, RadialDmg.Params.GetMaxRadius(), 100000 /*RadialDmg.DamageTypeClass->DamageImpulse*/, ERadialImpulseFalloff::RIF_Linear);
+			}
 		}
 	}
 }
@@ -189,6 +195,11 @@ void ABaseCharacter::PlayHit(bool bKilled, float DamageTaken, struct FDamageEven
 void ABaseCharacter::SetRagdollPhysics()
 {
 	USkeletalMeshComponent* Mesh3P = GetMesh();
+	if (Mesh3P)
+	{
+		Mesh3P->SetCollisionProfileName(TEXT("Ragdoll"));
+	}
+	SetActorEnableCollision(true);
 
 	if (!IsPendingKill() || Mesh3P || Mesh3P->GetPhysicsAsset())
 	{
@@ -197,7 +208,7 @@ void ABaseCharacter::SetRagdollPhysics()
 		Mesh3P->WakeAllRigidBodies();
 		Mesh3P->bBlendPhysics = true;
 
-		SetLifeSpan(10.0f);
+		SetLifeSpan(TimeAfterDeathBeforeDestroy);
 	}
 	else
 	{

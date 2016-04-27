@@ -32,7 +32,7 @@ protected:
 
 	void PlaySoundLoop();
 
-	void OnSeePlayer(APawn* Pawn);
+	void StartAttackingPlayer();
 
 	void OnRetriggerMeleeStrike();
 
@@ -49,17 +49,33 @@ protected:
 	float MeleeDamage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
-	UAnimMontage* MeleeAnimMontage;
+	TArray<UAnimMontage*> MeleeAnimMontages;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attacked")
+	UAnimMontage* BodyHitAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attacked")
+	UAnimMontage* HeadHitAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attacked")
+	UAnimMontage* DefaultHitAnimMontage;
+
+
+
 
 	/* Timer handle to manage continous melee attacks while in range of a player */
 	FTimerHandle TimerHandle_MeleeAttack;
 
 	/* Minimum time between melee attacks */
+	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
 	float MeleeStrikeCooldown;
 
 	/* Plays the idle, wandering or hunting sound */
 	UPROPERTY(VisibleAnywhere, Category = "Sound")
 	UAudioComponent* AudioLoopComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	float StartUpTime;
 
 
 	UAudioComponent* PlayCharacterSound(USoundCue* CueToPlay);

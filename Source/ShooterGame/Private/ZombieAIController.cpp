@@ -17,7 +17,6 @@ AZombieAIController::AZombieAIController()
 	/* Match with the AI/ZombieBlackboard */
 	CurrentWaypointKeyName = "CurrentWaypoint";
 	TargetEnemyKeyName = "TargetEnemy";
-
 	/* Initializes PlayerState so we can assign a team index to AI */
 	bWantsPlayerState = true;
 }

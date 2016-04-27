@@ -29,6 +29,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CharacterCondition")
 	bool IsAlive() const;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	bool bRagdolledAfterDeath;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	float TimeAfterDeathBeforeDestroy;
+
+	UFUNCTION(BlueprintPure, Category = "CharacterCondition")
 	bool IsDying();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")

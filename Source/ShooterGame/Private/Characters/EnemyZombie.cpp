@@ -38,6 +38,8 @@ AEnemyZombie::AEnemyZombie()
 	Health = 100;
 	MeleeDamage = 24.0f;
 	MeleeStrikeCooldown = 1.0f;
+	StartUpTime = 0;
+	bRagdolledAfterDeath = true;
 }
 
 void AEnemyZombie::BeginPlay()
@@ -64,13 +66,20 @@ void AEnemyZombie::BeginPlay()
 void AEnemyZombie::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 }
 
 void AEnemyZombie::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	// Start Making the zombie chase the player
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AEnemyZombie::StartAttackingPlayer, StartUpTime, false);
+}
+
+void AEnemyZombie::StartAttackingPlayer()
+{
+	/* Keep track of the time the player was last sensed in order to clear the target */
+
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -78,23 +87,16 @@ void AEnemyZombie::PossessedBy(AController* NewController)
 		APawn* Pawn = PC->GetPawn();
 		if (Pawn)
 		{
-			OnSeePlayer(Pawn);
+			AZombieAIController* AIController = Cast<AZombieAIController>(GetController());
+			ABaseCharacter* SensedPawn = Cast<ABaseCharacter>(Pawn);
+			if (AIController && SensedPawn->IsAlive())
+			{
+				AIController->SetTargetEnemy(SensedPawn);
+			}
 		}
 	}
 
 
-}
-
-void AEnemyZombie::OnSeePlayer(APawn* Pawn)
-{
-	/* Keep track of the time the player was last sensed in order to clear the target */
-
-	AZombieAIController* AIController = Cast<AZombieAIController>(GetController());
-	ABaseCharacter* SensedPawn = Cast<ABaseCharacter>(Pawn);
-	if (AIController && SensedPawn->IsAlive())
-	{
-		AIController->SetTargetEnemy(SensedPawn);
-	}
 }
 
 void AEnemyZombie::PlaySoundLoop()
@@ -105,6 +107,11 @@ void AEnemyZombie::PlaySoundLoop()
 
 void AEnemyZombie::PerformMeleeStrike(AActor* HitActor)
 {
+	if (IsDying())
+	{
+		return;
+	}
+
 	if (LastMeleeAttackTime + MeleeStrikeCooldown > GetWorld()->GetTimeSeconds())
 	{
 		/* Set timer to start attacking as soon as the cooldown elapses. */
@@ -163,7 +170,7 @@ UAudioComponent* AEnemyZombie::PlayCharacterSound(USoundCue* CueToPlay)
 
 void AEnemyZombie::SimulateMeleeStrike()
 {
-	PlayAnimMontage(MeleeAnimMontage);
+	PlayAnimMontage(MeleeAnimMontages[FMath::RandRange(0, MeleeAnimMontages.Num() - 1)]);
 	PlayCharacterSound(SoundAttackMelee);
 }
 
@@ -209,5 +216,25 @@ void AEnemyZombie::PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent 
 	if (AudioLoopComp && bKilled)
 	{
 		AudioLoopComp->Stop();
+	}
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		FPointDamageEvent* PointDamageEvent = (FPointDamageEvent*)&DamageEvent;
+		UPhysicalMaterial * PhysMat = PointDamageEvent->HitInfo.PhysMaterial.Get();
+		if (PhysMat)
+		{
+			if (HeadHitAnimMontage && PhysMat->SurfaceType == SURFACE_HEAD)
+			{
+				PlayAnimMontage(HeadHitAnimMontage);
+			}
+			else if (BodyHitAnimMontage && PhysMat->SurfaceType == SURFACE_BODY)
+			{
+				PlayAnimMontage(BodyHitAnimMontage);
+			}
+			else if(DefaultHitAnimMontage)
+			{
+				PlayAnimMontage(DefaultHitAnimMontage);
+			}
+		}
 	}
 }
