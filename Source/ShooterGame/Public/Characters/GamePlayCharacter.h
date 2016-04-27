@@ -51,6 +51,15 @@ private:
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FPPMesh;
 public:
+
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
+	float RegenerationRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
+	float RegenrationCastingTime;
+
+	float LastTimeTakeDamage;
+
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<class AWeapon> WeaponSlot1;
 

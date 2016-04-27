@@ -32,7 +32,7 @@ protected:
 	UFUNCTION()
 	void OnMeleeCompBeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	void PlaySoundLoop();
+	void PlaySoundLoop(USoundCue* LoopSound);
 
 	void StartAttackingPlayer();
 
@@ -62,8 +62,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attacked")
 	UAnimMontage* DefaultHitAnimMontage;
 
-
-
+	ABaseCharacter* TargetCharacter;
 
 	/* Timer handle to manage continous melee attacks while in range of a player */
 	FTimerHandle TimerHandle_MeleeAttack;
@@ -79,20 +78,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
 	float StartUpTime;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	float SneakySpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	float ChargeSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	float DistanceBeforeCharging;
 
 	UAudioComponent* PlayCharacterSound(USoundCue* CueToPlay);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	USoundCue* SoundPlayerNoticed;
+	USoundCue* SoundCharge;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	USoundCue* SoundHunting;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	USoundCue* SoundIdle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	USoundCue* SoundWandering;
+	USoundCue* SoundSneak;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* SoundAttackMelee;

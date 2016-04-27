@@ -10,8 +10,14 @@
 AGamePlayCharacter::AGamePlayCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 	bUseControllerRotationYaw = true;
 	WeaponPullDownPercent = 0;
+
+	LastTimeTakeDamage = 0;
+	RegenerationRate = 5;
+	RegenrationCastingTime = 3;
 
 	//Set Mesh Variables
 	USkeletalMeshComponent* Mesh = GetMesh();
@@ -50,6 +56,10 @@ void AGamePlayCharacter::BeginPlay()
 void AGamePlayCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Health < GetMaxHealth() && RegenrationCastingTime > GetWorld()->TimeSeconds - LastTimeTakeDamage)
+	{
+		Health += RegenerationRate * DeltaTime;
+	}
 }
 
 // Called to bind functionality to input
@@ -131,6 +141,8 @@ UCameraComponent* AGamePlayCharacter::GetCamera()
 
 void AGamePlayCharacter::PlayHit(bool bKilled, float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
 {
+	LastTimeTakeDamage = GetWorld()->TimeSeconds;
+
 	Super::PlayHit(bKilled, DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
 	AGamePlayPlayerController* MyPC = Cast<AGamePlayPlayerController>(Controller);
 	AGamePlayHUD* MyHUD = MyPC ? Cast<AGamePlayHUD>(MyPC->GetHUD()) : NULL;

@@ -10,7 +10,7 @@ AEnemyZombie::AEnemyZombie()
 	/* Note: We assign the Controller class in the Blueprint extension of this class
 	Because the zombie AIController is a blueprint in content and it's better to avoid content references in code.  */
 	/*AIControllerClass = ASZombieAIController::StaticClass();*/
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	/* Ignore this channel or it will absorb the trace impacts instead of the skeletal mesh */
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f, false);
@@ -38,7 +38,9 @@ AEnemyZombie::AEnemyZombie()
 	Health = 100;
 	MeleeDamage = 24.0f;
 	MeleeStrikeCooldown = 1.0f;
-	StartUpTime = 0;
+	StartUpTime = .01f;
+	SneakySpeed = 50;
+	ChargeSpeed = 100;
 	bRagdolledAfterDeath = true;
 	bRagdolledAfterDeath = false;
 }
@@ -52,7 +54,7 @@ void AEnemyZombie::BeginPlay()
 		MeleeCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEnemyZombie::OnMeleeCompBeginOverlap);
 	}
 
-	PlaySoundLoop();
+	PlaySoundLoop(SoundSneak);
 
 	/* Assign a basic name to identify the bots in the HUD. */
 	AShooterPlayerState* PS = Cast<AShooterPlayerState>(PlayerState);
@@ -62,11 +64,26 @@ void AEnemyZombie::BeginPlay()
 		PS->bIsABot = true;
 	}
 
+	GetCharacterMovement()->MaxWalkSpeed = SneakySpeed;
+
+	GetMovementComponent()->NavAgentProps.AgentRadius = GetCapsuleComponent()->GetScaledCapsuleRadius();
+	GetMovementComponent()->NavAgentProps.AgentHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2;
 }
 
 void AEnemyZombie::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (TargetCharacter && (CharacterMovement->MaxWalkSpeed != ChargeSpeed))
+	{
+		const FVector MyLocation = GetActorLocation();
+		const FVector TargetLocation = TargetCharacter->GetActorLocation();
+		if ((TargetLocation - MyLocation).Size() < DistanceBeforeCharging)
+		{
+			CharacterMovement->MaxWalkSpeed = ChargeSpeed;
+			PlaySoundLoop(SoundCharge);
+		}
+	}
 }
 
 void AEnemyZombie::PossessedBy(AController* NewController)
@@ -89,20 +106,18 @@ void AEnemyZombie::StartAttackingPlayer()
 		if (Pawn)
 		{
 			AZombieAIController* AIController = Cast<AZombieAIController>(GetController());
-			ABaseCharacter* SensedPawn = Cast<ABaseCharacter>(Pawn);
-			if (AIController && SensedPawn->IsAlive())
+			TargetCharacter = Cast<ABaseCharacter>(Pawn);
+			if (AIController && TargetCharacter->IsAlive())
 			{
-				AIController->SetTargetEnemy(SensedPawn);
+				AIController->SetTargetEnemy(TargetCharacter);
 			}
 		}
 	}
-
-
 }
 
-void AEnemyZombie::PlaySoundLoop()
+void AEnemyZombie::PlaySoundLoop(USoundCue* LoopSound)
 {
-	AudioLoopComp->SetSound(SoundHunting);
+	AudioLoopComp->SetSound(SoundCharge);
 	AudioLoopComp->Play();
 }
 
