@@ -21,6 +21,8 @@ class SHOOTERGAME_API AEnemyZombie : public ABaseCharacter
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void PossessedBy(AController* NewController) override;
+
+
 protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Attacking")

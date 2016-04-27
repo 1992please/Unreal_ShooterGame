@@ -10,10 +10,23 @@ ABaseCharacter::ABaseCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 	Health = 100;
+	RegenerationRate = 0;
 	TimeAfterDeathBeforeDestroy = 10;
 	bRagdolledAfterDeath = false;
+	LastTimeTakeDamage = 0;
 }
+
+void ABaseCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (Health < GetMaxHealth() && 3 > GetWorld()->TimeSeconds - LastTimeTakeDamage)
+	{
+		Health += RegenerationRate * DeltaSeconds;
+	}
+}
+
 
 float ABaseCharacter::GetHealth() const
 {
@@ -39,6 +52,8 @@ float ABaseCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		/* Modify based based on gametype rules */
 		//ASGameMode* MyGameMode = Cast<ASGameMode>(GetWorld()->GetAuthGameMode());
 		//Damage = MyGameMode ? MyGameMode->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : Damage;
+
+		LastTimeTakeDamage = GetWorld()->TimeSeconds;
 
 		const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 		if (ActualDamage > 0.f)

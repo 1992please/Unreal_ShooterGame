@@ -14,6 +14,8 @@ public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundCue* SoundTakeHit;
 
@@ -40,6 +42,11 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
 	float Health;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
+	float RegenerationRate;
+
+	float LastTimeTakeDamage;
 
 	/* Take damage & handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;

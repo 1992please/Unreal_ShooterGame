@@ -40,6 +40,7 @@ AEnemyZombie::AEnemyZombie()
 	MeleeStrikeCooldown = 1.0f;
 	StartUpTime = 0;
 	bRagdolledAfterDeath = true;
+	bRagdolledAfterDeath = false;
 }
 
 void AEnemyZombie::BeginPlay()
